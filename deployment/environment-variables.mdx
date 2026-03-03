@@ -1,0 +1,204 @@
+---
+title: 'Environment Variables'
+description: 'Configuration guide for all required and optional environment variables'
+---
+
+## Overview
+
+The Mario Rodriguez Portfolio requires specific environment variables to enable full functionality, particularly for the contact form feature. These variables should be configured in your Vercel project settings or in a local `.env.local` file for development.
+
+<Warning>
+  Never commit `.env` or `.env.local` files containing real API keys to version control. Add these files to your `.gitignore`.
+</Warning>
+
+## Required Variables
+
+### RESEND_API_KEY
+
+<ParamField path="RESEND_API_KEY" type="string" required>
+  API key for the Resend email service, used to send contact form submissions.
+  
+  **Used in**: `src/app/api/contact/route.ts:10,18`
+  
+  **How to obtain**:
+  1. Sign up for a [Resend account](https://resend.com)
+  2. Navigate to API Keys in your Resend dashboard
+  3. Create a new API key
+  4. Copy the key (it starts with `re_`)
+  
+  **Example**: `re_123456789_AbCdEfGhIjKlMnOpQrStUvWxYz`
+  
+  <Warning>
+    If this variable is not set, the contact form will return a 503 error with the message "Email service is not configured."
+  </Warning>
+</ParamField>
+
+## Optional Variables
+
+### CONTACT_EMAIL
+
+<ParamField path="CONTACT_EMAIL" type="string" default="maerodriguezdev@gmail.com">
+  The email address that will receive contact form submissions.
+  
+  **Used in**: `src/app/api/contact/route.ts:42`
+  
+  **Default behavior**: If not set, emails are sent to `maerodriguezdev@gmail.com`
+  
+  **Example**: `your.email@example.com`
+  
+  <Info>
+    This should be an email address you have verified in your Resend account to ensure deliverability.
+  </Info>
+</ParamField>
+
+## Setting Environment Variables
+
+### Local Development
+
+For local development, create a `.env.local` file in the root of your project:
+
+```bash
+# .env.local
+RESEND_API_KEY=re_your_actual_api_key_here
+CONTACT_EMAIL=your.email@example.com
+```
+
+The Next.js development server (`npm run dev`) will automatically load these variables.
+
+### Vercel Production
+
+<Steps>
+  <Step title="Navigate to Project Settings">
+    Go to your Vercel project dashboard and click on "Settings"
+  </Step>
+
+  <Step title="Access Environment Variables">
+    In the left sidebar, click on "Environment Variables"
+  </Step>
+
+  <Step title="Add Each Variable">
+    For each environment variable:
+    
+    1. Enter the variable name (e.g., `RESEND_API_KEY`)
+    2. Enter the variable value
+    3. Select which environments should have access:
+       - **Production**: Live deployment
+       - **Preview**: Branch and PR deployments
+       - **Development**: Local development via Vercel CLI
+    4. Click "Save"
+  </Step>
+
+  <Step title="Redeploy">
+    After adding or updating environment variables, trigger a new deployment for changes to take effect:
+    
+    - Push a new commit, or
+    - Use the "Redeploy" button in the Vercel dashboard
+  </Step>
+</Steps>
+
+## Environment Variable Security
+
+### Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Use Vercel's Environment Variables" icon="lock">
+    Store sensitive keys in Vercel's environment variable system, not in your code or git repository.
+  </Card>
+
+  <Card title="Separate Environments" icon="layer-group">
+    Use different API keys for Production, Preview, and Development environments when possible.
+  </Card>
+
+  <Card title="Rotate Keys Regularly" icon="rotate">
+    Periodically regenerate API keys and update them in Vercel to maintain security.
+  </Card>
+
+  <Card title="Monitor Usage" icon="chart-line">
+    Keep track of your API usage in Resend to detect any unusual activity.
+  </Card>
+</CardGroup>
+
+### If a Key is Compromised
+
+If you suspect an API key has been exposed:
+
+1. **Immediately revoke** the compromised key in your Resend dashboard
+2. **Generate a new key** in Resend
+3. **Update the environment variable** in Vercel with the new key
+4. **Redeploy** your application
+5. **Review logs** for any unauthorized usage
+
+## Verification
+
+### Test Contact Form Locally
+
+To verify your environment variables are configured correctly:
+
+```bash
+# Start the development server
+npm run dev
+
+# Navigate to http://localhost:3000
+# Fill out and submit the contact form
+# Check your email for the submission
+```
+
+### Test in Production
+
+After deploying to Vercel:
+
+1. Visit your production URL
+2. Navigate to the contact form section
+3. Submit a test message
+4. Verify the email arrives at your configured `CONTACT_EMAIL`
+
+### Check Function Logs
+
+If the contact form isn't working:
+
+1. Go to your Vercel project dashboard
+2. Click on "Logs" in the left sidebar
+3. Filter by the `/api/contact` function
+4. Look for error messages related to environment variables
+
+Common error messages:
+
+- `RESEND_API_KEY is not configured` - The API key is missing
+- `Invalid API key` - The API key is incorrect or revoked
+- `Failed to send email` - Check your Resend account status and email verification
+
+## Environment Variables Reference
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `RESEND_API_KEY` | Yes | None | API key for Resend email service |
+| `CONTACT_EMAIL` | No | `maerodriguezdev@gmail.com` | Recipient email for contact form submissions |
+
+## Additional Configuration
+
+### Resend Configuration
+
+The contact form is configured with these settings in `src/app/api/contact/route.ts:40-44`:
+
+- **From address**: `Portfolio Contact <onboarding@resend.dev>`
+- **Reply-to**: Uses the email provided by the form submitter
+- **Subject**: Custom subject if provided, otherwise "New message from [name]"
+
+<Info>
+  The `onboarding@resend.dev` address is Resend's default sender for testing. For production, consider setting up a custom domain in Resend for better deliverability and branding.
+</Info>
+
+### Email Template
+
+The contact form sends HTML-formatted emails with:
+- Sender's name, email, and optional subject
+- Message content with preserved formatting
+- Styled with your portfolio's color scheme (dark theme with green accents)
+
+You can customize the email template in `src/app/api/contact/route.ts:45-64`.
+
+## Related Documentation
+
+- [Deploy to Vercel](/deployment/vercel)
+- [Resend Documentation](https://resend.com/docs)
+- [Next.js Environment Variables](https://nextjs.org/docs/basic-features/environment-variables)

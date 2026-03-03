@@ -1,0 +1,116 @@
+---
+title: Footer
+description: Portfolio footer component with logo, copyright, and social links
+---
+
+# Footer
+
+A footer component that displays branding, copyright information, and social media links in a responsive layout.
+
+## Location
+
+**Source:** `src/components/Footer.tsx`
+
+## Features
+
+- Responsive flexbox layout (column on mobile, row on desktop)
+- Logo with link to homepage
+- Dynamic copyright year
+- Social media icon links
+- Custom SVG icons for social platforms
+- Dark theme with border separator
+
+## Props
+
+This component does not accept any props.
+
+## Usage
+
+Typically placed at the bottom of the root layout:
+
+```tsx src/app/layout.tsx
+import Footer from "@/components/Footer";
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <Footer />
+      </body>
+    </html>
+  );
+}
+```
+
+## Layout Structure
+
+The footer is divided into three main sections:
+
+1. **Logo & Name** - Left aligned, links to home page
+2. **Copyright** - Center aligned with dynamic year
+3. **Social Links** - Right aligned icon buttons
+
+## Icon Components
+
+The footer includes three custom SVG icon components:
+
+### LinkIcon
+Represents website/portfolio link
+
+### CodeIcon  
+Represents GitHub or code repository link
+
+### ShareIcon
+Represents social sharing or social media link
+
+## Styling
+
+- Background: `bg-[#0a0f18]`
+- Border: `border-t border-[#232f48]`
+- Padding: `py-12 px-4 md:px-40`
+- Max width: `1200px` centered
+- Hover states: `hover:text-emerald-500`
+
+## Copyright Text
+
+The copyright year is dynamically generated:
+
+```tsx
+© {new Date().getFullYear()} Mario Rodríguez. All rights reserved.
+```
+
+## Social Links
+
+Each social link includes:
+- Icon component
+- Hover color transition to emerald
+- `aria-label` for accessibility
+- Default `href="#"` (to be replaced with actual URLs)
+
+## Responsive Design
+
+- **Mobile**: Stacked vertical layout with centered items
+- **Desktop**: Horizontal layout with space-between alignment
+- Gap spacing: `gap-8` between sections
+
+## Accessibility
+
+- Semantic `<footer>` element
+- `aria-label` attributes on icon links
+- Keyboard-accessible links
+- Sufficient color contrast ratios
+
+## Customization
+
+To update social links, modify the href attributes:
+
+```tsx
+<a
+  href="https://yourwebsite.com"
+  className="text-slate-400 hover:text-emerald-500 transition-colors"
+  aria-label="Website"
+>
+  <LinkIcon />
+</a>
+```

@@ -1,0 +1,308 @@
+---
+title: Projects Listing Page
+description: Documentation for the projects listing page component
+---
+
+# Projects Listing Page
+
+The projects listing page (`src/app/projects/page.tsx`) displays all portfolio projects in a responsive grid with interactive cards and animations.
+
+## Page Type
+
+This is a **client component** as indicated by the `"use client"` directive:
+
+```tsx
+"use client";
+```
+
+This is required because the page uses:
+- Framer Motion animations
+- Interactive hover effects
+- Client-side state management
+
+## Page Structure
+
+The page consists of two main parts:
+
+1. **Header Section** - Page title and description
+2. **Projects Grid** - Grid of project cards with animations
+
+## Component Implementation
+
+```tsx
+export default function ProjectsPage() {
+    return (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+            <Reveal>
+                <header className="mb-12">
+                    <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-slate-100">
+                        PROJECTS
+                    </h1>
+                    <p className="text-slate-400 max-w-2xl">
+                        A selection of projects I've worked on. Each one represents
+                        different technical challenges and implemented solutions.
+                    </p>
+                </header>
+            </Reveal>
+
+            <div className="grid sm:grid-cols-2 gap-6">
+                {projects.map((project, index) => (
+                    <Reveal key={project.slug} delay={0.1 * index}>
+                        {/* Project card */}
+                    </Reveal>
+                ))}
+            </div>
+        </div>
+    );
+}
+```
+
+## Project Card Component
+
+Each project is wrapped in a `Link` component with Framer Motion animations:
+
+```tsx
+<Link href={`/projects/${project.slug}`} className="block group">
+    <motion.div
+        whileHover={{ y: -6 }}
+        transition={{ type: "spring", stiffness: 420, damping: 28 }}
+        className="overflow-hidden bg-slate-900/50 border border-white/10 rounded-2xl hover:border-cyan-400/30 transition-colors"
+    >
+        {/* Card content */}
+    </motion.div>
+</Link>
+```
+
+### Animation Properties:
+
+- **whileHover**: `{ y: -6 }` - Lifts card 6px on hover
+- **transition**: `{ type: "spring", stiffness: 420, damping: 28 }` - Spring animation with specific physics
+- **Border transition**: `border-white/10` → `border-cyan-400/30` on hover
+
+## Conditional Preview Display
+
+The card displays different content based on project type:
+
+### API Projects
+
+For projects with `displayType === "api"`:
+
+```tsx
+{project.displayType === "api" && project.apiPreview ? (
+    <div className="p-4">
+        <ApiPreviewCard
+            endpoints={project.apiPreview.endpoints}
+            baseUrl={project.apiPreview.baseUrl}
+            maxEndpoints={4}
+        />
+    </div>
+) : (
+    // Standard image preview
+)}
+```
+
+### Web App Projects
+
+For standard web applications:
+
+```tsx
+<div className="relative aspect-video overflow-hidden">
+    {project.images?.desktop[0] && (
+        <Image
+            src={project.images.desktop[0].src}
+            alt={project.images.desktop[0].alt}
+            fill
+            sizes="(max-width: 640px) 100vw, 50vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+    )}
+</div>
+```
+
+### Image Properties:
+- **aspect-video**: Maintains 16:9 aspect ratio
+- **fill**: Next.js Image component fills parent container
+- **sizes**: Responsive image sizing for optimal performance
+  - Mobile (≤640px): 100vw
+  - Desktop: 50vw (half viewport width)
+- **group-hover:scale-105**: Image scales 105% on card hover
+
+## Project Info Section
+
+Each card includes project metadata:
+
+```tsx
+<div className="p-6">
+    <div className="flex items-center gap-2 mb-2">
+        {project.displayType === "api" && (
+            <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-tight bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded">
+                API
+            </span>
+        )}
+        <h2 className="text-xl font-semibold text-slate-100 group-hover:text-cyan-400 transition-colors">
+            {project.title}
+        </h2>
+    </div>
+    <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+        {project.description}
+    </p>
+    <div className="flex flex-wrap gap-2">
+        {project.stack.slice(0, 4).map((tech) => (
+            <span
+                key={tech}
+                className="px-2.5 py-1 text-xs font-medium text-slate-300 bg-white/5 border border-white/10 rounded-lg"
+            >
+                {tech}
+            </span>
+        ))}
+    </div>
+</div>
+```
+
+### Features:
+
+1. **API Badge**: Conditional badge for API projects
+2. **Title**: Changes to cyan on hover
+3. **Description**: Limited to 2 lines with `line-clamp-2`
+4. **Tech Stack**: Shows first 4 technologies using `slice(0, 4)`
+
+## Staggered Reveal Animations
+
+Each project card has a staggered reveal animation:
+
+```tsx
+{projects.map((project, index) => (
+    <Reveal key={project.slug} delay={0.1 * index}>
+        <Link href={`/projects/${project.slug}`} className="block group">
+            {/* Card content */}
+        </Link>
+    </Reveal>
+))}
+```
+
+### Delay Calculation:
+- **First project**: 0.1 * 0 = 0s
+- **Second project**: 0.1 * 1 = 0.1s
+- **Third project**: 0.1 * 2 = 0.2s
+- **Fourth project**: 0.1 * 3 = 0.3s
+- And so on...
+
+This creates a waterfall animation effect.
+
+## Grid Layout
+
+```tsx
+<div className="grid sm:grid-cols-2 gap-6">
+    {/* Project cards */}
+</div>
+```
+
+### Responsive Behavior:
+- **Mobile**: Single column
+- **Small screens and up**: 2 columns
+- **Gap**: 1.5rem (24px) between cards
+
+## Header Section
+
+```tsx
+<Reveal>
+    <header className="mb-12">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-slate-100">
+            PROJECTS
+        </h1>
+        <p className="text-slate-400 max-w-2xl">
+            A selection of projects I've worked on. Each one represents
+            different technical challenges and implemented solutions.
+        </p>
+    </header>
+</Reveal>
+```
+
+### Typography:
+- **H1**: 3xl on mobile, 4xl on small screens
+- **Description**: Max width of 2xl (672px) for readability
+
+## Dependencies
+
+```tsx
+import Link from "next/link";
+import Image from "next/image";
+import { motion } from "motion/react";
+import { projects } from "@/data/projects";
+import Reveal from "@/components/Reveal";
+import ApiPreviewCard from "@/components/ApiPreviewCard";
+```
+
+### Key Imports:
+- **motion/react**: Framer Motion for animations
+- **@/data/projects**: Projects data source
+- **Reveal**: Custom scroll reveal component
+- **ApiPreviewCard**: Component for API project previews
+
+## Complete Card Structure
+
+```tsx
+<Reveal key={project.slug} delay={0.1 * index}>
+    <Link href={`/projects/${project.slug}`} className="block group">
+        <motion.div
+            whileHover={{ y: -6 }}
+            transition={{ type: "spring", stiffness: 420, damping: 28 }}
+            className="overflow-hidden bg-slate-900/50 border border-white/10 rounded-2xl hover:border-cyan-400/30 transition-colors"
+        >
+            {/* Conditional: API Preview or Image */}
+            {project.displayType === "api" && project.apiPreview ? (
+                <div className="p-4">
+                    <ApiPreviewCard
+                        endpoints={project.apiPreview.endpoints}
+                        baseUrl={project.apiPreview.baseUrl}
+                        maxEndpoints={4}
+                    />
+                </div>
+            ) : (
+                <div className="relative aspect-video overflow-hidden">
+                    {project.images?.desktop[0] && (
+                        <Image
+                            src={project.images.desktop[0].src}
+                            alt={project.images.desktop[0].alt}
+                            fill
+                            sizes="(max-width: 640px) 100vw, 50vw"
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                    )}
+                </div>
+            )}
+
+            {/* Project Info */}
+            <div className="p-6">
+                <div className="flex items-center gap-2 mb-2">
+                    {project.displayType === "api" && (
+                        <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-tight bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded">
+                            API
+                        </span>
+                    )}
+                    <h2 className="text-xl font-semibold text-slate-100 group-hover:text-cyan-400 transition-colors">
+                        {project.title}
+                    </h2>
+                </div>
+                <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+                    {project.description}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                    {project.stack.slice(0, 4).map((tech) => (
+                        <span
+                            key={tech}
+                            className="px-2.5 py-1 text-xs font-medium text-slate-300 bg-white/5 border border-white/10 rounded-lg"
+                        >
+                            {tech}
+                        </span>
+                    ))}
+                </div>
+            </div>
+        </motion.div>
+    </Link>
+</Reveal>
+```
+
+## File Location
+
+`src/app/projects/page.tsx:1-91`

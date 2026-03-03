@@ -1,0 +1,372 @@
+---
+title: 'Animations'
+description: 'Framer Motion animations and interaction patterns'
+---
+
+## Overview
+
+The portfolio uses **Motion** (formerly Framer Motion) for smooth, performant animations. The library provides declarative animation APIs and scroll-triggered reveals.
+
+## Installation
+
+Motion is included as a dependency:
+
+```json
+{
+  "dependencies": {
+    "motion": "^12.29.2"
+  }
+}
+```
+
+Install with:
+
+```bash
+pnpm install motion
+```
+
+## Reveal Component
+
+The `Reveal` component provides scroll-triggered fade-in animations with accessibility support.
+
+**File:** `src/components/Reveal.tsx`
+
+### Component Code
+
+```tsx
+"use client";
+
+import { motion, useReducedMotion } from "motion/react";
+import { ReactNode } from "react";
+
+type RevealProps = {
+    children: ReactNode;
+    className?: string;
+    delay?: number;
+    aboveFold?: boolean;
+};
+
+export default function Reveal({
+    children,
+    className,
+    delay = 0,
+    aboveFold = false,
+}: RevealProps) {
+    const reduce = useReducedMotion();
+
+    // If above-the-fold or user reduces motion:
+    // DO NOT hide content initially
+    if (aboveFold || reduce) {
+        return <div className={className}>{children}</div>;
+    }
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: "easeOut", delay }}
+            viewport={{ once: true, amount: 0.2 }}
+            className={className}
+        >
+            {children}
+        </motion.div>
+    );
+}
+```
+
+### Props
+
+<ParamField path="children" type="ReactNode" required>
+  Content to animate
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply
+</ParamField>
+
+<ParamField path="delay" type="number" default="0">
+  Animation delay in seconds (e.g., `0.1`, `0.2`)
+</ParamField>
+
+<ParamField path="aboveFold" type="boolean" default="false">
+  Skip animation for above-the-fold content (improves LCP)
+</ParamField>
+
+### Usage Examples
+
+#### Basic Reveal
+
+```tsx
+import Reveal from "@/components/Reveal";
+
+export default function Section() {
+  return (
+    <Reveal>
+      <h2>This fades in when scrolled into view</h2>
+    </Reveal>
+  );
+}
+```
+
+#### With Delay
+
+Create staggered animations:
+
+```tsx
+<Reveal delay={0}>
+  <h2>First element</h2>
+</Reveal>
+
+<Reveal delay={0.1}>
+  <p>Second element</p>
+</Reveal>
+
+<Reveal delay={0.2}>
+  <button>Third element</button>
+</Reveal>
+```
+
+#### Above the Fold
+
+Skip animation for content immediately visible:
+
+```tsx
+<Reveal aboveFold>
+  <h1>Hero Heading - No Animation</h1>
+</Reveal>
+```
+
+#### With Custom Styling
+
+```tsx
+<Reveal className="max-w-2xl mx-auto" delay={0.2}>
+  <div className="glass-card p-6">
+    Card content
+  </div>
+</Reveal>
+```
+
+## Animation Parameters
+
+### Initial State
+
+```tsx
+initial={{ opacity: 0, y: 14 }}
+```
+
+- **opacity: 0** - Starts invisible
+- **y: 14** - Positioned 14px below final position (subtle upward motion)
+
+### Final State
+
+```tsx
+whileInView={{ opacity: 1, y: 0 }}
+```
+
+- **opacity: 1** - Fully visible
+- **y: 0** - At natural position
+
+### Transition
+
+```tsx
+transition={{ duration: 0.45, ease: "easeOut", delay }}
+```
+
+- **duration: 0.45** - 450ms animation (smooth but quick)
+- **ease: "easeOut"** - Natural deceleration
+- **delay** - Optional delay from props
+
+### Viewport Settings
+
+```tsx
+viewport={{ once: true, amount: 0.2 }}
+```
+
+- **once: true** - Animate only on first scroll into view
+- **amount: 0.2** - Trigger when 20% of element is visible
+
+## Accessibility
+
+### Reduced Motion Support
+
+The component respects user motion preferences:
+
+```tsx
+const reduce = useReducedMotion();
+
+if (aboveFold || reduce) {
+  return <div className={className}>{children}</div>;
+}
+```
+
+Users who enable "Reduce motion" in their OS settings will see content without animation.
+
+### Performance Considerations
+
+1. **Above-the-fold optimization**: Use `aboveFold={true}` for hero content to improve Largest Contentful Paint (LCP)
+2. **Once-only animations**: `viewport={{ once: true }}` prevents re-animation on scroll, improving performance
+3. **GPU acceleration**: Motion automatically uses transform and opacity for hardware acceleration
+
+## CSS Transitions
+
+For simpler animations, the portfolio uses CSS transitions:
+
+### Hover Effects
+
+```css
+.tech-badge {
+  transition: all 0.3s ease;
+}
+
+.tech-badge:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+}
+```
+
+### Color Transitions
+
+```tsx
+className="transition-colors hover:text-emerald-500"
+```
+
+### Common Patterns
+
+```tsx
+// Button hover
+className="transition-colors hover:bg-emerald-600"
+
+// Link hover
+className="transition-colors hover:text-emerald-400"
+
+// Card hover
+className="transition-all hover:border-emerald-500/50"
+
+// Transform hover
+className="transition-transform hover:scale-105"
+```
+
+## Interactive Components
+
+### Image Carousel Navigation
+
+The `ImageCarousel` component uses opacity transitions for button visibility:
+
+```tsx
+className="opacity-0 group-hover:opacity-100 transition-opacity"
+```
+
+Buttons fade in when hovering over the carousel container.
+
+### Navbar Backdrop
+
+The navigation uses backdrop blur for depth:
+
+```tsx
+className="bg-[#101622]/80 backdrop-blur-md"
+```
+
+Creates a frosted glass effect over page content.
+
+### Dot Indicators
+
+Active state transitions:
+
+```tsx
+className={`transition-all ${
+  index === currentIndex
+    ? "bg-emerald-500 w-6"
+    : "bg-white/40 hover:bg-white/60"
+}`}
+```
+
+## Best Practices
+
+### When to Use Motion
+
+✅ **Use Motion for:**
+- Scroll-triggered reveals
+- Complex, orchestrated animations
+- Gesture-based interactions
+- Animation sequences
+
+❌ **Use CSS for:**
+- Simple hover states
+- Color transitions
+- Basic transforms
+- Always-visible elements
+
+### Performance Tips
+
+1. **Limit animated elements**: Don't animate every element on page
+2. **Use transform and opacity**: These are GPU-accelerated
+3. **Respect reduced motion**: Always check `useReducedMotion()`
+4. **Optimize above-fold**: Skip animations for hero content
+5. **Animate once**: Use `viewport={{ once: true }}` for reveals
+
+### Animation Timing
+
+```tsx
+// Quick feedback (buttons, links)
+transition: 0.15s - 0.2s
+
+// Standard animations (reveals, cards)
+transition: 0.3s - 0.45s
+
+// Slower, dramatic effects
+transition: 0.6s - 0.8s
+```
+
+### Stagger Delays
+
+Create natural sequences with incremental delays:
+
+```tsx
+{items.map((item, index) => (
+  <Reveal key={item.id} delay={index * 0.1}>
+    <Card {...item} />
+  </Reveal>
+))}
+```
+
+## Common Animation Patterns
+
+### Fade In on Scroll
+
+```tsx
+<Reveal>
+  <section>Content</section>
+</Reveal>
+```
+
+### Staggered List
+
+```tsx
+{projects.map((project, i) => (
+  <Reveal key={project.id} delay={i * 0.15}>
+    <ProjectCard {...project} />
+  </Reveal>
+))}
+```
+
+### Hero Section (No Animation)
+
+```tsx
+<Reveal aboveFold>
+  <h1>Page Title</h1>
+</Reveal>
+```
+
+### With Custom Classes
+
+```tsx
+<Reveal className="max-w-4xl mx-auto" delay={0.2}>
+  <article>Article content</article>
+</Reveal>
+```
+
+## Related Documentation
+
+- [Design System](/styling/design-system) - Color and typography
+- [Tailwind Setup](/styling/tailwind-setup) - CSS configuration
+- [Reveal Component](/components/reveal) - Reveal component reference

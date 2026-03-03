@@ -1,0 +1,207 @@
+---
+title: 'Deploy to Vercel'
+description: 'Complete guide to deploying the Mario Rodriguez Portfolio to Vercel'
+---
+
+## Overview
+
+This portfolio is built with Next.js 16 and optimized for deployment on Vercel. It leverages several Vercel-specific features including Vercel Blob Storage and Speed Insights for optimal performance.
+
+## Prerequisites
+
+Before deploying, ensure you have:
+
+- A [Vercel account](https://vercel.com/signup)
+- A GitHub, GitLab, or Bitbucket repository with your portfolio code
+- Access to required API keys (see [Environment Variables](/deployment/environment-variables))
+
+## Vercel Features Used
+
+This portfolio integrates the following Vercel services:
+
+- **Vercel Blob Storage** - Used for storing and serving portfolio images with optimized delivery
+- **Vercel Speed Insights** - Real-time performance monitoring and analytics
+- **Next.js Image Optimization** - Automatic image optimization with AVIF and WebP formats
+
+## Deployment Steps
+
+<Steps>
+  <Step title="Connect Your Repository">
+    1. Log in to your [Vercel Dashboard](https://vercel.com/dashboard)
+    2. Click "Add New Project"
+    3. Import your Git repository containing the portfolio code
+    4. Select the repository and click "Import"
+  </Step>
+
+  <Step title="Configure Project Settings">
+    Vercel will automatically detect that this is a Next.js project. Verify the following settings:
+    
+    - **Framework Preset**: Next.js
+    - **Build Command**: `npm run build` (auto-detected from package.json)
+    - **Output Directory**: `.next` (default)
+    - **Install Command**: `npm install`
+    - **Root Directory**: `./` (or your source directory if different)
+  </Step>
+
+  <Step title="Set Environment Variables">
+    Add the required environment variables in the Vercel project settings:
+    
+    1. Go to "Settings" → "Environment Variables"
+    2. Add each variable listed in the [Environment Variables](/deployment/environment-variables) guide
+    3. Choose which environments (Production, Preview, Development) should have access to each variable
+    
+    <Warning>
+      Never commit `.env` files containing sensitive API keys to your repository. Always use Vercel's environment variable management.
+    </Warning>
+  </Step>
+
+  <Step title="Configure Vercel Blob Storage">
+    If you're using custom images stored in Vercel Blob:
+    
+    1. Navigate to your project's Storage settings
+    2. Create a new Blob store or connect an existing one
+    3. Update the `next.config.ts` remote patterns with your Blob storage hostname
+    4. The current configuration uses: `9jaubfal4qpj0a4o.public.blob.vercel-storage.com`
+  </Step>
+
+  <Step title="Deploy">
+    Click "Deploy" to start your first deployment. Vercel will:
+    
+    - Install dependencies
+    - Run the build command (`next build`)
+    - Deploy to a production URL
+    - Provide preview URLs for all branches and pull requests
+    
+    Your portfolio will be available at `https://your-project-name.vercel.app`
+  </Step>
+
+  <Step title="Verify Deployment">
+    After deployment completes:
+    
+    1. Visit your production URL
+    2. Test the contact form functionality (requires RESEND_API_KEY)
+    3. Check that images load correctly from Vercel Blob Storage
+    4. Verify Speed Insights is tracking in the Vercel Analytics dashboard
+  </Step>
+</Steps>
+
+## Build Configuration
+
+The portfolio uses the following npm scripts defined in `package.json:5-9`:
+
+```json
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  }
+}
+```
+
+- **dev**: Runs the development server locally
+- **build**: Creates an optimized production build
+- **start**: Starts the production server (used by Vercel)
+- **lint**: Runs ESLint for code quality checks
+
+## Next.js Configuration
+
+The `next.config.ts` file includes important settings for deployment:
+
+### Image Optimization
+
+```typescript
+images: {
+  formats: ["image/avif", "image/webp"],
+  remotePatterns: [
+    {
+      protocol: "https",
+      hostname: "9jaubfal4qpj0a4o.public.blob.vercel-storage.com",
+      pathname: "/**",
+    },
+  ],
+}
+```
+
+This configuration:
+- Enables modern image formats (AVIF and WebP) for better performance
+- Allows loading images from Vercel Blob Storage
+- Provides automatic image optimization and responsive sizing
+
+## Continuous Deployment
+
+Once connected, Vercel automatically deploys:
+
+- **Production deployments** - Every push to your main/master branch
+- **Preview deployments** - Every push to other branches and pull requests
+- **Instant rollbacks** - Revert to any previous deployment with one click
+
+## Custom Domain Setup
+
+To use a custom domain:
+
+<Steps>
+  <Step title="Add Domain">
+    1. Go to your project Settings → Domains
+    2. Enter your custom domain name
+    3. Click "Add"
+  </Step>
+
+  <Step title="Configure DNS">
+    Update your domain's DNS records according to Vercel's instructions:
+    
+    - **A Record**: Point to `76.76.21.21`
+    - **CNAME Record**: Point to `cname.vercel-dns.com`
+  </Step>
+
+  <Step title="Wait for SSL">
+    Vercel automatically provisions and renews SSL certificates via Let's Encrypt. This usually takes a few minutes.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+### Build Failures
+
+If your build fails:
+
+1. Check the build logs in the Vercel dashboard
+2. Verify all environment variables are set correctly
+3. Ensure your `package.json` has the correct Node.js version (if specified)
+4. Test the build locally with `npm run build`
+
+### Contact Form Not Working
+
+If the contact form doesn't send emails:
+
+1. Verify `RESEND_API_KEY` is set in environment variables
+2. Check that `CONTACT_EMAIL` is configured (defaults to `maerodriguezdev@gmail.com`)
+3. Review the function logs in Vercel dashboard under "Logs"
+4. Ensure the API route `src/app/api/contact/route.ts:5` has `dynamic = "force-dynamic"`
+
+### Images Not Loading
+
+If images from Vercel Blob aren't displaying:
+
+1. Verify the Blob storage hostname in `next.config.ts:9`
+2. Check that the Blob store is connected to your project
+3. Ensure images are uploaded to the correct Blob store
+4. Review the Next.js Image component implementation
+
+## Performance Optimization
+
+The portfolio includes Vercel Speed Insights (`@vercel/speed-insights:13`) for monitoring:
+
+- **Real User Monitoring (RUM)** - Track actual user experience
+- **Web Vitals** - Monitor Core Web Vitals (LCP, FID, CLS)
+- **Performance Score** - Overall performance metrics
+
+Access analytics at: `https://vercel.com/[your-team]/[your-project]/analytics`
+
+## Additional Resources
+
+- [Vercel Documentation](https://vercel.com/docs)
+- [Next.js Deployment Docs](https://nextjs.org/docs/deployment)
+- [Vercel Blob Storage](https://vercel.com/docs/storage/vercel-blob)
+- [Vercel Speed Insights](https://vercel.com/docs/speed-insights)

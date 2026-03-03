@@ -1,0 +1,167 @@
+---
+title: ApiPreviewCard
+description: Terminal-styled card component for displaying API endpoint previews
+---
+
+# ApiPreviewCard
+
+A visually appealing card component that displays API endpoints in a terminal-like interface with color-coded HTTP methods.
+
+## Location
+
+**Source:** `src/components/ApiPreviewCard.tsx`
+
+## Features
+
+- Terminal-style header with traffic light dots
+- Color-coded HTTP method badges (GET, POST, PUT, DELETE, PATCH)
+- Monospace font for endpoint paths
+- Optional base URL display
+- Configurable endpoint limit
+- "More endpoints" indicator
+- Full height flex layout support
+
+## Props
+
+<ParamField path="endpoints" type="Endpoint[]" required>
+  Array of endpoint objects to display
+</ParamField>
+
+<ParamField path="baseUrl" type="string">
+  Optional base URL to display in the terminal header
+</ParamField>
+
+<ParamField path="maxEndpoints" type="number" default={4}>
+  Maximum number of endpoints to display before showing "more" indicator
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the component (e.g., "h-full")
+</ParamField>
+
+## Type Definitions
+
+The component uses the following types from `@/data/projects`:
+
+```typescript
+type Endpoint = {
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+  path: string;
+  label?: string;
+};
+```
+
+## Method Colors
+
+HTTP methods are styled with semantic colors:
+
+- **GET**: Emerald (green) - `bg-emerald-500/20 text-emerald-400`
+- **POST**: Blue - `bg-blue-500/20 text-blue-400`
+- **PUT**: Amber (orange) - `bg-amber-500/20 text-amber-400`
+- **DELETE**: Red - `bg-red-500/20 text-red-400`
+- **PATCH**: Violet (purple) - `bg-violet-500/20 text-violet-400`
+
+## Usage
+
+### Basic Example
+
+```tsx
+import ApiPreviewCard from "@/components/ApiPreviewCard";
+
+const endpoints = [
+  { method: "GET", path: "/items" },
+  { method: "POST", path: "/items" },
+  { method: "GET", path: "/items/{id}" },
+  { method: "DELETE", path: "/items/{id}" },
+];
+
+<ApiPreviewCard endpoints={endpoints} />;
+```
+
+### With Base URL
+
+```tsx
+<ApiPreviewCard 
+  endpoints={endpoints} 
+  baseUrl="/v1" 
+/>
+```
+
+### Project Card Integration
+
+From `src/app/page.tsx`:
+
+```tsx
+{project.displayType === "api" && project.apiPreview ? (
+  <Link href={`/projects/${project.slug}`} className="block h-full">
+    <ApiPreviewCard
+      className="h-full"
+      endpoints={project.apiPreview.endpoints}
+      baseUrl={project.apiPreview.baseUrl}
+      maxEndpoints={4}
+    />
+  </Link>
+) : null}
+```
+
+### Custom Height
+
+```tsx
+<ApiPreviewCard 
+  endpoints={endpoints}
+  className="h-full"
+  maxEndpoints={6}
+/>
+```
+
+## Terminal Header
+
+The header includes:
+- Three colored dots (red, amber, emerald) mimicking macOS traffic lights
+- "API PREVIEW" label in slate-500
+- Optional base URL in monospace font
+
+## Endpoints List
+
+Each endpoint displays:
+- HTTP method badge with semantic color
+- Endpoint path in monospace font
+- 3-pixel gap between badge and path
+
+## Overflow Handling
+
+When the number of endpoints exceeds `maxEndpoints`:
+
+```tsx
+{hasMore && (
+  <div className="text-slate-500 text-xs pt-1">
+    +{endpoints.length - maxEndpoints} more endpoints
+  </div>
+)}
+```
+
+## Styling
+
+- Background: `bg-slate-950`
+- Border: `border border-white/10`
+- Border radius: `rounded-xl`
+- Font: Monospace (`font-mono`) for technical content
+- Internal padding: `p-4`
+- Item spacing: `space-y-2`
+
+## Layout Behavior
+
+The component uses flexbox for proper height handling:
+
+```tsx
+className={[
+  "bg-slate-950 border border-white/10 rounded-xl overflow-hidden",
+  "h-full flex flex-col",
+  className,
+].join(" ")}
+```
+
+This ensures:
+- Header stays at the top (`shrink-0`)
+- Endpoints list fills remaining space (`flex-1`)
+- Proper height inheritance from parent containers

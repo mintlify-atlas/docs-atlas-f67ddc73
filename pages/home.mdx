@@ -1,0 +1,329 @@
+---
+title: Home Page
+description: Documentation for the portfolio home page component
+---
+
+# Home Page
+
+The home page (`src/app/page.tsx`) is the main landing page of the Mario Rodriguez Portfolio. It showcases skills, featured projects, tech stack, and a call-to-action section.
+
+## Page Structure
+
+The home page consists of several key sections:
+
+1. **Hero Section** - Introduction with availability badge and CTA buttons
+2. **Specialties Section** - Three core competencies (Frontend, Backend, DevOps)
+3. **Projects Section** - Featured projects grid with preview cards
+4. **Process Section** - Four-step workflow visualization
+5. **Tech Stack Section** - Technology badges with icons
+6. **CTA Section** - Contact call-to-action with WhatsApp and email links
+
+## Hero Section
+
+The hero section features a two-column layout with text content and profile photo:
+
+```tsx
+<section className="flex flex-col gap-10 py-12 lg:flex-row lg:items-center lg:justify-between lg:py-20">
+  <div className="flex flex-col gap-6 lg:max-w-[600px]">
+    {/* Availability Badge */}
+    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 w-fit">
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+      </span>
+      <span className="text-emerald-500 text-xs font-bold uppercase tracking-widest">Available for projects</span>
+    </div>
+
+    {/* Main Headline */}
+    <h1 className="text-white text-5xl md:text-6xl font-black leading-[1.1] tracking-tighter uppercase">
+      WEB DEVELOPER <span className="text-emerald-500">.NET + NEXT.JS</span>
+    </h1>
+
+    {/* Description */}
+    <p className="text-slate-600 dark:text-slate-400 text-lg md:text-xl font-normal max-w-[500px]">
+      I build fast and scalable web applications with clean UI and robust APIs.
+    </p>
+
+    {/* CTA Buttons */}
+    <div className="flex flex-wrap gap-3">
+      <a href="#projects" className="flex min-w-[140px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-emerald-500 text-white text-base font-bold tracking-wide hover:scale-105 transition-transform shadow-lg shadow-emerald-500/20">
+        View Projects
+      </a>
+      <a href="#contact" className="flex min-w-[140px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-[#232f48] text-white text-base font-bold tracking-wide hover:bg-[#2d3b5a] transition-colors">
+        Let's Talk
+      </a>
+    </div>
+
+    {/* Tech Badges */}
+    <div className="flex gap-2 flex-wrap pt-4">
+      {heroTechBadges.map((tech) => (
+        <span key={tech} className="px-3 py-1 bg-[#1a2333] border border-[#232f48] rounded text-xs font-semibold hover:border-emerald-500/50 transition-colors">
+          {tech}
+        </span>
+      ))}
+    </div>
+  </div>
+
+  {/* Profile Photo */}
+  <div className="relative group">
+    <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+    <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-[#1a2333] shadow-2xl">
+      <Image
+        src="/images/profile.png"
+        alt="Professional portrait of Mario Rodriguez"
+        fill
+        sizes="(max-width: 768px) 256px, 320px"
+        className="object-cover"
+        priority
+      />
+    </div>
+  </div>
+</section>
+```
+
+### Key Features:
+- **Animated availability badge** with pulsing effect
+- **Responsive layout** that switches from column to row on large screens
+- **Hover effects** on buttons and tech badges
+- **Profile image** with gradient glow effect on hover
+
+## Specialties Section
+
+Displays three core competencies with custom SVG icons:
+
+```tsx
+const specialties = [
+  {
+    icon: <DevicesIcon />,
+    title: "Frontend",
+    description: "Modern, responsive interfaces built with Next.js, Tailwind CSS, and Blazor Server. Focused on performance, accessibility, and clean user experience.",
+  },
+  {
+    icon: <DatabaseIcon />,
+    title: "Backend",
+    description: "Robust APIs with .NET (ASP.NET Core / Minimal APIs) and EF Core. Designed to scale with solid architecture, security, and maintainability.",
+  },
+  {
+    icon: <CloudIcon />,
+    title: "DevOps & Cloud",
+    description: "Deployment and automation with Docker, Azure, and CI/CD pipelines. Ensuring stability, continuity, and fast delivery to production.",
+  },
+];
+```
+
+Each specialty card features:
+- Custom SVG icon that scales on hover
+- Glass morphism effect with `glass-card` class
+- Responsive 3-column grid on desktop, single column on mobile
+
+## Projects Section
+
+The featured projects section displays a grid of project cards with two display types:
+
+### Standard Project Card (Web Apps)
+
+```tsx
+<Link
+  href={`/projects/${project.slug}`}
+  className="relative block h-full overflow-hidden rounded-xl shadow-lg border border-transparent group-hover:border-emerald-500/30 transition-colors"
+  aria-label={`View details for ${project.title}`}
+>
+  {cover && (
+    <Image
+      src={cover.src}
+      alt={cover.alt}
+      fill
+      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+      className="object-cover transition-transform duration-500 group-hover:scale-110"
+    />
+  )}
+
+  {/* Hover overlay */}
+  <div className="absolute inset-0 bg-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+    <span className="bg-white text-emerald-600 px-4 py-2 rounded-lg font-bold text-sm shadow-xl hover:bg-slate-50">
+      View Details
+    </span>
+  </div>
+</Link>
+```
+
+### API Project Card
+
+For projects with `displayType === "api"`, the page uses the `ApiPreviewCard` component:
+
+```tsx
+{project.displayType === "api" && project.apiPreview ? (
+  <Link href={`/projects/${project.slug}`} className="block h-full">
+    <ApiPreviewCard
+      className="h-full"
+      endpoints={project.apiPreview.endpoints}
+      baseUrl={project.apiPreview.baseUrl}
+      maxEndpoints={4}
+    />
+  </Link>
+) : (
+  // Standard image preview
+)}
+```
+
+### Fixed Card Heights
+
+All project cards maintain consistent height:
+
+```tsx
+<div className="mb-4 h-[220px]">
+  {/* Preview area with fixed height */}
+</div>
+```
+
+## Process Section
+
+Visualizes the four-step development workflow:
+
+```tsx
+const processSteps = [
+  { number: "01", title: "Discovery", description: "Requirements gathering, scope definition, and project objectives." },
+  { number: "02", title: "Design", description: "UI/UX prototyping and technical architecture." },
+  { number: "03", title: "Development", description: "Frontend + backend implementation, testing, and quality assurance." },
+  { number: "04", title: "Delivery", description: "Deployment, optimization, monitoring, and ongoing support." },
+];
+```
+
+Features:
+- Numbered circles with ring effects
+- Horizontal connecting line on desktop
+- First step highlighted with emerald color
+- Vertical layout on mobile, horizontal on desktop
+
+## Tech Stack Section
+
+Displays technology badges with icons from `react-icons`:
+
+```tsx
+const techStack = [
+  { name: "TypeScript", icon: <SiTypescript className="w-8 h-8" /> },
+  { name: "Next.js", icon: <SiNextdotjs className="w-8 h-8" /> },
+  { name: "C#", icon: <CSharpIcon /> },
+  { name: ".NET 10", icon: <SiDotnet className="w-8 h-8" /> },
+  { name: "Blazor Server", icon: <SiBlazor className="w-8 h-8" /> },
+  { name: "EF Core", icon: <EFCoreIcon /> },
+  { name: "PostgreSQL", icon: <SiPostgresql className="w-8 h-8" /> },
+  { name: "Docker", icon: <SiDocker className="w-8 h-8" /> },
+  { name: "Azure", icon: <AzureIcon /> },
+  { name: "Github", icon: <SiGithub className="w-8 h-8" /> },
+];
+```
+
+Each badge includes:
+- Icon rotation and scale on hover
+- Text color change to emerald on hover
+- Rounded pill shape with dark background
+
+## CTA Section
+
+The final call-to-action section features:
+
+```tsx
+<section className="py-20" id="contact">
+  <div className="bg-emerald-500 rounded-2xl p-10 md:p-20 text-center relative overflow-hidden shadow-2xl shadow-emerald-500/20">
+    {/* Decorative blurs */}
+    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+    <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full -ml-32 -mb-32 blur-3xl"></div>
+
+    <h2 className="text-4xl md:text-5xl font-black text-white mb-6 uppercase tracking-tighter relative z-10">
+      Let's Build Something Together
+    </h2>
+    <p className="text-white/90 text-lg md:text-xl mb-10 max-w-2xl mx-auto relative z-10">
+      I'm available for new projects and collaborations. If you have an idea, let's make it happen.
+    </p>
+    <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-20">
+      <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="bg-white text-emerald-500 px-8 py-4 rounded-lg font-bold text-lg hover:scale-105 transition-transform flex items-center justify-center gap-2 shadow-lg min-w-[200px]">
+        <SiWhatsapp /> Send Message
+      </a>
+      <Link href="/contact" className="bg-[#0a192f] text-white border-2 border-transparent px-8 py-4 rounded-lg font-bold text-lg hover:bg-black transition-colors flex items-center justify-center gap-2 shadow-xl min-w-[200px]">
+        <EmailCtaIcon /> Send a Message
+      </Link>
+    </div>
+  </div>
+</section>
+```
+
+### WhatsApp Integration
+
+```tsx
+const phone = "50372330330"; // sin +, sin espacios
+const text = encodeURIComponent("Hi Mario! I saw your portfolio and I'd like to discuss a project.");
+const whatsappUrl = `https://wa.me/${phone}?text=${text}`;
+```
+
+## Layout Patterns
+
+### Container Pattern
+
+All sections use a consistent max-width container:
+
+```tsx
+<main className="max-w-[1200px] mx-auto px-4 md:px-10">
+  {/* Content */}
+</main>
+```
+
+### Section Dividers
+
+Sections are separated with top borders:
+
+```tsx
+<section className="py-16 border-t border-[#232f48]">
+  {/* Section content */}
+</section>
+```
+
+### Responsive Grid Patterns
+
+```tsx
+// 3-column grid (specialties)
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+// Projects grid with auto-fit
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 items-stretch">
+
+// Process steps - column to row
+<div className="relative flex flex-col md:flex-row gap-8 justify-between">
+```
+
+## Custom Icon Components
+
+The page includes several custom SVG icon components:
+
+```tsx
+function DevicesIcon() {
+  return (
+    <svg className="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  );
+}
+```
+
+## Dependencies
+
+```tsx
+import Image from "next/image";
+import {
+  SiTypescript,
+  SiNextdotjs,
+  SiDotnet,
+  SiPostgresql,
+  SiDocker,
+  SiGithub,
+  SiBlazor,
+  SiWhatsapp
+} from "react-icons/si";
+import { projects } from "@/data/projects";
+import ApiPreviewCard from "@/components/ApiPreviewCard";
+import Link from "next/link";
+```
+
+## File Location
+
+`src/app/page.tsx:1-430`

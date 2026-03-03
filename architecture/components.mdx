@@ -1,0 +1,483 @@
+---
+title: Component Architecture
+description: Reusable component patterns and design system
+---
+
+## Component Overview
+
+The portfolio uses a **component-based architecture** with atomic, reusable React components. Components are organized by responsibility and follow consistent patterns for styling, typing, and composition.
+
+## Component Directory
+
+```
+src/components/
+├── ApiPreviewCard.tsx      # API endpoint preview (terminal-style)
+├── CodeBlock.tsx           # Sample request/response display
+├── EndpointsTable.tsx      # API endpoints documentation table
+├── Footer.tsx              # Site footer with links
+├── ImageCarousel.tsx       # Project image carousel with navigation
+├── Navbar.tsx              # Main navigation header
+├── PhoneFrame.tsx          # Mobile screenshot frame wrapper
+└── Reveal.tsx              # Scroll-triggered animation wrapper
+```
+
+---
+
+## Core Components
+
+### 1. Navbar (`Navbar.tsx`)
+
+**Purpose**: Sticky header navigation with mobile menu.
+
+**Type**: Client Component (`"use client"`)
+
+**Features**:
+- Sticky positioning with backdrop blur
+- Responsive mobile hamburger menu
+- Logo with custom SVG component
+- Hash anchor navigation (#projects, #stack, #contact)
+- Download Resume button (placeholder)
+
+**State Management**:
+```typescript
+const [isOpen, setIsOpen] = useState(false);
+```
+
+**Structure**:
+```typescript
+<header className="sticky top-0 z-50 backdrop-blur-md">
+  <div className="max-w-[1200px] mx-auto flex items-center justify-between">
+    {/* Logo */}
+    <Link href="/">
+      <Logo />
+      <h2>Mario Rodríguez</h2>
+    </Link>
+
+    {/* Desktop Navigation */}
+    <nav className="hidden md:flex">
+      {navLinks.map((link) => (
+        <a href={link.href}>{link.label}</a>
+      ))}
+    </nav>
+
+    {/* Mobile Menu Button */}
+    <button onClick={() => setIsOpen(!isOpen)}>
+      {/* Hamburger icon */}
+    </button>
+  </div>
+
+  {/* Mobile Navigation */}
+  {isOpen && <nav>{/* Mobile links */}</nav>}
+</header>
+```
+
+**Navigation Data**:
+```typescript
+const navLinks = [
+  { href: "/#projects", label: "Projects" },
+  { href: "/#stack", label: "Stack" },
+  { href: "/#contact", label: "Contact" },
+];
+```
+
+---
+
+### 2. ImageCarousel (`ImageCarousel.tsx`)
+
+**Purpose**: Interactive image carousel for project screenshots.
+
+**Type**: Client Component
+
+**Props**:
+```typescript
+import type { ProjectImage } from "@/data/projects";
+
+type ImageCarouselProps = {
+  images: ProjectImage[];
+};
+```
+
+**State Management**:
+```typescript
+const [currentIndex, setCurrentIndex] = useState(0);
+
+const goToPrevious = () => {
+  setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+};
+
+const goToNext = () => {
+  setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+};
+```
+
+**Features**:
+- Previous/Next arrow navigation (hidden until hover)
+- Dot indicators for each image
+- Image counter (e.g., "3 / 6")
+- Optimized Next.js Image with priority loading for first image
+- Aspect ratio: 16:9 (`aspect-video`)
+
+**UI Elements**:
+```typescript
+<div className="relative w-full h-full group">
+  {/* Main Image */}
+  <div className="aspect-video">
+    <Image src={images[currentIndex].src} alt={...} />
+  </div>
+
+  {/* Navigation Arrows (shown on hover) */}
+  <button className="opacity-0 group-hover:opacity-100" onClick={goToPrevious} />
+  <button className="opacity-0 group-hover:opacity-100" onClick={goToNext} />
+
+  {/* Dots Indicator */}
+  <div className="flex gap-2">
+    {images.map((_, index) => (
+      <button onClick={() => setCurrentIndex(index)} />
+    ))}
+  </div>
+
+  {/* Image Counter */}
+  <div className="absolute top-4 right-4">
+    {currentIndex + 1} / {images.length}
+  </div>
+</div>
+```
+
+---
+
+### 3. ApiPreviewCard (`ApiPreviewCard.tsx`)
+
+**Purpose**: Terminal-style preview of API endpoints (for API projects).
+
+**Type**: Server Component (no state)
+
+**Props**:
+```typescript
+import type { Endpoint } from "@/data/projects";
+
+type ApiPreviewCardProps = {
+  endpoints: Endpoint[];
+  baseUrl?: string;
+  maxEndpoints?: number;
+  className?: string;
+};
+```
+
+**Default Values**:
+- `maxEndpoints = 4`
+- Shows "+X more endpoints" if list is truncated
+
+**HTTP Method Color Coding**:
+```typescript
+const methodColors: Record<string, string> = {
+  GET: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+  POST: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  PUT: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+  DELETE: "bg-red-500/20 text-red-400 border-red-500/30",
+  PATCH: "bg-violet-500/20 text-violet-400 border-violet-500/30",
+};
+```
+
+**Structure**:
+```typescript
+<div className="bg-slate-950 border border-white/10 rounded-xl">
+  {/* Terminal Header */}
+  <div className="bg-slate-900/50 border-b">
+    <div className="flex gap-1.5">
+      <span className="w-3 h-3 rounded-full bg-red-500/80" />
+      <span className="w-3 h-3 rounded-full bg-amber-500/80" />
+      <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
+    </div>
+    <span>API PREVIEW</span>
+    {baseUrl && <span>{baseUrl}</span>}
+  </div>
+
+  {/* Endpoints List */}
+  <div className="p-4 space-y-2 font-mono">
+    {displayEndpoints.map((endpoint) => (
+      <div className="flex items-center gap-3">
+        <span className={methodColors[endpoint.method]}>
+          {endpoint.method}
+        </span>
+        <span>{endpoint.path}</span>
+      </div>
+    ))}
+  </div>
+</div>
+```
+
+---
+
+### 4. PhoneFrame (`PhoneFrame.tsx`)
+
+**Purpose**: Stylized mobile phone frame for mobile screenshots.
+
+**Type**: Server Component
+
+**Props**:
+```typescript
+import type { ProjectImage } from "@/data/projects";
+
+type PhoneFrameProps = {
+  image: ProjectImage;
+};
+```
+
+**Features**:
+- iPhone-style frame with rounded corners
+- Dynamic notch/bezel
+- Optimized image loading
+- Fixed aspect ratio
+
+---
+
+### 5. Reveal (`Reveal.tsx`)
+
+**Purpose**: Scroll-triggered fade-in animation wrapper.
+
+**Type**: Client Component
+
+**Props**:
+```typescript
+type RevealProps = {
+  children: React.ReactNode;
+  delay?: number;
+};
+```
+
+**Implementation**: Uses Framer Motion's `motion` and viewport detection:
+
+```typescript
+import { motion } from "motion/react";
+
+export default function Reveal({ children, delay = 0 }: RevealProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+```
+
+**Usage Pattern**:
+```typescript
+<Reveal delay={0.1}>
+  <section>{/* Content appears with fade-in */}</section>
+</Reveal>
+```
+
+---
+
+### 6. EndpointsTable (`EndpointsTable.tsx`)
+
+**Purpose**: Comprehensive table of API endpoints with method, path, and description.
+
+**Type**: Server Component
+
+**Props**:
+```typescript
+type EndpointsTableProps = {
+  endpoints: Endpoint[];
+  baseUrl?: string;
+};
+```
+
+**Features**:
+- Full list (no truncation)
+- HTTP method badges with color coding
+- Optional labels for endpoint descriptions
+- Responsive table layout
+
+---
+
+### 7. CodeBlock (`CodeBlock.tsx`)
+
+**Purpose**: Syntax-highlighted code display for API request/response samples.
+
+**Type**: Server Component
+
+**Props**:
+```typescript
+import type { SampleRequest } from "@/data/projects";
+
+type CodeBlockProps = {
+  sample: SampleRequest;
+};
+```
+
+**Features**:
+- Separate sections for request and response
+- Copy-to-clipboard button
+- Syntax highlighting (likely using Prism or Shiki)
+- Monospace font styling
+
+**Sample Structure**:
+```typescript
+<div className="space-y-4">
+  <div>
+    <h4>Request</h4>
+    <pre><code>{sample.method} {sample.endpoint}</code></pre>
+    <pre><code>{sample.headers}</code></pre>
+    <pre><code>{sample.body}</code></pre>
+  </div>
+  
+  <div>
+    <h4>Response</h4>
+    <pre><code>{sample.response}</code></pre>
+  </div>
+</div>
+```
+
+---
+
+### 8. Footer (`Footer.tsx`)
+
+**Purpose**: Site footer with social links and copyright.
+
+**Type**: Server Component
+
+**Features**:
+- Social media icons (GitHub, LinkedIn, etc.)
+- Copyright notice
+- Quick navigation links
+- Consistent with Navbar styling
+
+---
+
+## Component Patterns
+
+### 1. Client vs Server Components
+
+**Client Components** (require `"use client"`):
+- `Navbar` (useState for mobile menu)
+- `ImageCarousel` (useState for current index)
+- `Reveal` (uses Framer Motion hooks)
+- `ProjectsPage` (uses motion animations)
+
+**Server Components** (default):
+- `ApiPreviewCard` (pure rendering, no state)
+- `PhoneFrame` (pure rendering)
+- `EndpointsTable` (pure rendering)
+- `CodeBlock` (pure rendering)
+- `Footer` (static content)
+
+### 2. TypeScript Typing
+
+All components use strict TypeScript with explicit prop types:
+
+```typescript
+type ComponentProps = {
+  requiredProp: string;
+  optionalProp?: number;
+};
+
+export default function Component({ requiredProp, optionalProp = 0 }: ComponentProps) {
+  // ...
+}
+```
+
+### 3. Conditional Rendering
+
+Components handle empty states gracefully:
+
+```typescript
+if (!images || images.length === 0) return null;
+```
+
+### 4. Responsive Design
+
+Using Tailwind's responsive prefixes:
+
+```typescript
+className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+className="hidden md:flex"
+className="px-4 sm:px-6 lg:px-8"
+```
+
+### 5. Composition Over Configuration
+
+Components accept `className` props for layout flexibility:
+
+```typescript
+type Props = {
+  className?: string;
+};
+
+<div className={["base-classes", className].join(" ")}>
+```
+
+---
+
+## Design System
+
+### Color Palette
+
+```css
+/* Background */
+bg-[#101622]          /* Primary background */
+bg-[#1a2333]          /* Secondary background */
+bg-[#232f48]          /* Borders/dividers */
+
+/* Text */
+text-white            /* Primary text */
+text-slate-300        /* Secondary text */
+text-slate-400        /* Tertiary text */
+text-slate-500        /* Muted text */
+
+/* Accent */
+text-emerald-500      /* Primary CTA */
+text-cyan-400         /* Links/highlights */
+```
+
+### Typography
+
+```css
+/* Headings */
+font-black tracking-tighter uppercase  /* Hero titles */
+font-bold tracking-tight               /* Section headings */
+
+/* Body */
+font-normal text-lg                    /* Regular text */
+font-medium text-sm                    /* Labels */
+```
+
+### Spacing
+
+Consistent padding/margin scale:
+- `p-4` / `p-6` / `p-8` for card padding
+- `gap-2` / `gap-4` / `gap-6` for flex/grid spacing
+- `mb-4` / `mb-8` / `mb-12` for section spacing
+
+### Border Radius
+
+```css
+rounded-lg           /* Buttons, small cards */
+rounded-xl           /* Cards, modals */
+rounded-2xl          /* Hero sections, large containers */
+rounded-full         /* Pills, badges, avatars */
+```
+
+---
+
+## Animation Conventions
+
+Using Framer Motion for subtle animations:
+
+```typescript
+// Hover scale
+whileHover={{ y: -6 }}
+transition={{ type: "spring", stiffness: 420, damping: 28 }}
+
+// Scroll reveal
+initial={{ opacity: 0, y: 20 }}
+whileInView={{ opacity: 1, y: 0 }}
+viewport={{ once: true }}
+
+// Staggered reveals
+delay={0.1 * index}
+```

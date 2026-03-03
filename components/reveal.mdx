@@ -1,0 +1,347 @@
+---
+title: Reveal
+description: Motion-based reveal animation wrapper for scroll-triggered content animations
+---
+
+# Reveal
+
+A wrapper component that adds smooth fade-in and slide-up animations when content enters the viewport. Respects user accessibility preferences for reduced motion.
+
+## Location
+
+**Source:** `src/components/Reveal.tsx`
+
+## Features
+
+- Scroll-triggered animations
+- Fade in + slide up effect
+- Configurable delay
+- Respects `prefers-reduced-motion`
+- Above-the-fold optimization
+- One-time animation (doesn't repeat)
+- Customizable viewport threshold
+- Framer Motion powered
+
+## Props
+
+<ParamField path="children" type="ReactNode" required>
+  Content to be revealed with animation
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the wrapper div
+</ParamField>
+
+<ParamField path="delay" type="number" default={0}>
+  Animation delay in seconds (e.g., 0.1, 0.25, 0.5)
+</ParamField>
+
+<ParamField path="aboveFold" type="boolean" default={false}>
+  If true, content appears immediately without animation (for above-the-fold content)
+</ParamField>
+
+## Dependencies
+
+Requires Framer Motion:
+
+```bash
+npm install framer-motion
+```
+
+Imports used:
+
+```typescript
+import { motion, useReducedMotion } from "framer-motion";
+```
+
+## Usage
+
+### Basic Example
+
+```tsx
+import Reveal from "@/components/Reveal";
+
+<Reveal>
+  <h2>This heading will fade in when scrolled into view</h2>
+</Reveal>
+```
+
+### With Delay
+
+```tsx
+<Reveal delay={0.2}>
+  <p>This paragraph animates 200ms after entering viewport</p>
+</Reveal>
+```
+
+### Staggered Animations
+
+Create a cascade effect by increasing delays:
+
+```tsx
+<Reveal delay={0}>
+  <h1>Title</h1>
+</Reveal>
+
+<Reveal delay={0.1}>
+  <p>Subtitle</p>
+</Reveal>
+
+<Reveal delay={0.2}>
+  <button>Call to Action</button>
+</Reveal>
+```
+
+### Above the Fold Content
+
+```tsx
+<Reveal aboveFold>
+  <h1>Hero Title - No Animation Needed</h1>
+</Reveal>
+```
+
+### Project Detail Page Usage
+
+From `src/app/projects/[slug]/page.tsx`:
+
+```tsx
+{/* Back Link */}
+<Reveal>
+  <Link href="/projects">
+    BACK TO PROJECTS
+  </Link>
+</Reveal>
+
+{/* Hero Section */}
+<Reveal delay={0.1}>
+  <header className="mb-10">
+    <h1>{project.title}</h1>
+    <p>{project.description}</p>
+  </header>
+</Reveal>
+
+{/* Stats Row */}
+<Reveal delay={0.15}>
+  <div className="flex flex-wrap gap-3 mb-12">
+    {/* Badges */}
+  </div>
+</Reveal>
+
+{/* Gallery */}
+<Reveal delay={0.25}>
+  <ImageCarousel images={project.images!.desktop} />
+</Reveal>
+```
+
+### With Custom Classes
+
+```tsx
+<Reveal className="max-w-4xl mx-auto" delay={0.3}>
+  <section>
+    {/* Content */}
+  </section>
+</Reveal>
+```
+
+## Animation Properties
+
+### Initial State
+
+```typescript
+initial={{ opacity: 0, y: 14 }}
+```
+
+- Invisible (`opacity: 0`)
+- 14 pixels below final position (`y: 14`)
+
+### Final State
+
+```typescript
+whileInView={{ opacity: 1, y: 0 }}
+```
+
+- Fully visible (`opacity: 1`)
+- At natural position (`y: 0`)
+
+### Transition
+
+```typescript
+transition={{ duration: 0.45, ease: "easeOut", delay }}
+```
+
+- **Duration**: 450ms animation
+- **Easing**: `easeOut` for natural deceleration
+- **Delay**: Configurable via props
+
+### Viewport Settings
+
+```typescript
+viewport={{ once: true, amount: 0.2 }}
+```
+
+- **once**: Animation triggers only once
+- **amount**: Triggers when 20% of element is visible
+
+## Accessibility: Reduced Motion
+
+The component checks for user motion preferences:
+
+```typescript
+const reduce = useReducedMotion();
+
+if (aboveFold || reduce) {
+  return <div className={className}>{children}</div>;
+}
+```
+
+If user has `prefers-reduced-motion` enabled:
+- No animation applied
+- Content appears immediately
+- Still wrapped in a div for styling
+
+## Above-the-Fold Optimization
+
+For content visible on initial page load:
+
+```typescript
+if (aboveFold || reduce) {
+  return <div className={className}>{children}</div>;
+}
+```
+
+Bypasses animation to:
+- Prevent layout shift
+- Improve perceived performance
+- Avoid animation on hero content
+
+## Common Delay Patterns
+
+From the project detail page:
+
+- `0`: First element (back link)
+- `0.1`: Hero section
+- `0.15`: Stats/badges
+- `0.2`: Problem/Solution/Result
+- `0.25`: Gallery
+- `0.3`: Key features
+- `0.35`: Tech stack
+- `0.4`: Architecture
+- `0.45`: Challenges
+- `0.5`: Links
+- `0.55`: Lessons learned
+
+Increment by `0.05` to `0.15` for smooth staggering.
+
+## Performance Considerations
+
+1. **One-time animations**: `once: true` prevents re-animation on scroll
+2. **Low threshold**: `amount: 0.2` triggers early for smooth UX
+3. **Short duration**: `0.45s` feels snappy
+4. **Reduced motion support**: Respects user preferences
+
+## Example: Staggered Section
+
+```tsx
+<section className="space-y-8">
+  <Reveal delay={0}>
+    <h2>Section Title</h2>
+  </Reveal>
+
+  <Reveal delay={0.1}>
+    <p>Introduction paragraph</p>
+  </Reveal>
+
+  <Reveal delay={0.2}>
+    <div className="grid grid-cols-2 gap-4">
+      <Card />
+      <Card />
+    </div>
+  </Reveal>
+
+  <Reveal delay={0.3}>
+    <button>Learn More</button>
+  </Reveal>
+</section>
+```
+
+## Example: Conditional Reveal
+
+```tsx
+{hasExtendedInfo && (
+  <Reveal delay={0.2}>
+    <section className="mb-12">
+      <div className="grid gap-4 md:grid-cols-3">
+        {/* Problem/Solution/Result cards */}
+      </div>
+    </section>
+  </Reveal>
+)}
+```
+
+## Best Practices
+
+1. **Use sparingly** - Don't animate every element
+2. **Stagger thoughtfully** - Keep delays between 50-150ms
+3. **Group related content** - Wrap sections, not individual elements
+4. **Skip hero content** - Use `aboveFold` for immediate content
+5. **Test reduced motion** - Ensure content is accessible without animations
+6. **Consistent timing** - Use similar durations throughout the page
+
+## Browser Support
+
+Framer Motion supports:
+- Chrome/Edge 60+
+- Firefox 55+
+- Safari 12+
+- iOS Safari 12+
+
+Fallback: Content displays without animation in unsupported browsers.
+
+## TypeScript
+
+The component is fully typed:
+
+```typescript
+type RevealProps = {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+  aboveFold?: boolean;
+};
+```
+
+## Common Patterns
+
+### Sequential Cards
+
+```tsx
+{items.map((item, index) => (
+  <Reveal key={item.id} delay={index * 0.1}>
+    <Card {...item} />
+  </Reveal>
+))}
+```
+
+### Conditional Animation
+
+```tsx
+<Reveal delay={isFirstSection ? 0 : 0.2}>
+  <Section />
+</Reveal>
+```
+
+### Nested Reveals (Avoid)
+
+```tsx
+{/* ❌ Don't do this */}
+<Reveal delay={0}>
+  <Reveal delay={0.1}>
+    <Content />
+  </Reveal>
+</Reveal>
+
+{/* ✅ Do this instead */}
+<Reveal delay={0.1}>
+  <Content />
+</Reveal>
+```

@@ -1,0 +1,111 @@
+---
+title: Navbar
+description: Sticky navigation bar component with responsive mobile menu, logo, and call-to-action button
+---
+
+# Navbar
+
+A responsive navigation bar component that sticks to the top of the viewport, featuring a logo, navigation links, and a download resume button. Includes a mobile-friendly hamburger menu.
+
+## Location
+
+**Source:** `src/components/Navbar.tsx`
+
+## Features
+
+- Sticky positioning with backdrop blur effect
+- Responsive design with mobile hamburger menu
+- Custom SVG logo component
+- Smooth hover transitions
+- Navigation links with hash routing
+- Call-to-action button for resume download
+- Dark theme optimized
+
+## Props
+
+This component does not accept any props. Navigation links are defined internally.
+
+## Internal Configuration
+
+The navigation links are defined as a constant array:
+
+```typescript
+const navLinks = [
+  { href: "/#projects", label: "Projects" },
+  { href: "/#stack", label: "Stack" },
+  { href: "/#contact", label: "Contact" },
+];
+```
+
+## Usage
+
+The Navbar is typically used in the root layout to appear on all pages:
+
+```tsx src/app/layout.tsx
+import Navbar from "@/components/Navbar";
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        <Navbar />
+        {children}
+      </body>
+    </html>
+  );
+}
+```
+
+## Styling
+
+The component uses Tailwind CSS with custom color values:
+
+- Background: `bg-[#101622]/80` with `backdrop-blur-md`
+- Border: `border-[#232f48]`
+- Primary color: Emerald (`emerald-500`)
+- Text colors: White, slate-300
+
+## Mobile Behavior
+
+- Desktop navigation is hidden on small screens (`hidden md:flex`)
+- Mobile menu button appears on screens smaller than `md` breakpoint
+- Menu toggles between open/closed states
+- Clicking a link automatically closes the mobile menu
+
+## State Management
+
+The component uses React's `useState` hook to manage the mobile menu state:
+
+```typescript
+const [isOpen, setIsOpen] = useState(false);
+```
+
+## Desktop Navigation
+
+Desktop navigation includes:
+- Horizontal navigation links with hover effects
+- "Download Resume (PDF)" button
+- Flex layout with right alignment
+
+## Mobile Navigation
+
+Mobile navigation features:
+- Collapsible menu with border separator
+- Vertical list of navigation links
+- Full-width resume download button
+- Rounded hover states on links
+
+## Logo Component
+
+The navbar includes a custom SVG logo component with:
+- 48x48 viewBox dimensions
+- Emerald color scheme
+- Hover transition effects
+- Link to home page (`/`)
+
+## Accessibility
+
+- Semantic `<header>` element
+- Proper `<nav>` element for navigation
+- `aria-label` on mobile menu button
+- Keyboard-accessible links and buttons

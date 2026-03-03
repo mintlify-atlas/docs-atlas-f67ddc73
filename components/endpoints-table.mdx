@@ -1,0 +1,228 @@
+---
+title: EndpointsTable
+description: Tabular display component for API endpoints with HTTP methods and descriptions
+---
+
+# EndpointsTable
+
+A clean, organized table component that displays API endpoints with color-coded HTTP methods, paths, and optional labels.
+
+## Location
+
+**Source:** `src/components/EndpointsTable.tsx`
+
+## Features
+
+- Color-coded HTTP method badges
+- Monospace font for endpoint paths
+- Optional descriptive labels
+- Hover effects on rows
+- Optional base URL in header
+- Responsive design with hidden labels on small screens
+- Dark theme optimized
+
+## Props
+
+<ParamField path="endpoints" type="Endpoint[]" required>
+  Array of endpoint objects to display in the table
+</ParamField>
+
+<ParamField path="baseUrl" type="string">
+  Optional base URL to display in the table header
+</ParamField>
+
+## Type Definitions
+
+From `@/data/projects.ts`:
+
+```typescript
+type Endpoint = {
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+  path: string;
+  label?: string;
+};
+```
+
+## Method Colors
+
+HTTP methods are styled with semantic colors:
+
+- **GET**: Emerald (green) - `bg-emerald-500/20 text-emerald-400`
+- **POST**: Blue - `bg-blue-500/20 text-blue-400`
+- **PUT**: Amber (orange) - `bg-amber-500/20 text-amber-400`
+- **DELETE**: Red - `bg-red-500/20 text-red-400`
+- **PATCH**: Violet (purple) - `bg-violet-500/20 text-violet-400`
+
+## Usage
+
+### Basic Example
+
+```tsx
+import EndpointsTable from "@/components/EndpointsTable";
+
+const endpoints = [
+  { method: "GET", path: "/items", label: "List inventory items" },
+  { method: "POST", path: "/items", label: "Create item" },
+  { method: "GET", path: "/items/{id}", label: "Get item by ID" },
+  { method: "PUT", path: "/items/{id}", label: "Update item" },
+  { method: "DELETE", path: "/items/{id}", label: "Deactivate item" },
+];
+
+<EndpointsTable endpoints={endpoints} />;
+```
+
+### With Base URL
+
+```tsx
+<EndpointsTable 
+  endpoints={endpoints} 
+  baseUrl="/v1" 
+/>
+```
+
+### Project Detail Page Usage
+
+From `src/app/projects/[slug]/page.tsx`:
+
+```tsx
+{isApiProject && hasEndpoints && (
+  <Reveal delay={0.3}>
+    <section className="mb-12">
+      <h2 className="text-sm font-medium tracking-widest text-slate-500 mb-4">
+        ENDPOINTS
+      </h2>
+      <EndpointsTable
+        endpoints={project.apiPreview!.endpoints}
+        baseUrl={project.apiPreview!.baseUrl}
+      />
+    </section>
+  </Reveal>
+)}
+```
+
+### Without Labels
+
+```tsx
+const simpleEndpoints = [
+  { method: "GET", path: "/users" },
+  { method: "POST", path: "/users" },
+  { method: "DELETE", path: "/users/{id}" },
+];
+
+<EndpointsTable endpoints={simpleEndpoints} baseUrl="/api" />;
+```
+
+## Table Structure
+
+### Header
+
+The table header includes:
+- "Endpoints" label
+- Optional base URL in monospace font
+- Dark background with border
+
+```tsx
+<div className="px-4 py-3 bg-slate-900/50 border-b border-white/5 flex items-center justify-between">
+  <span className="text-sm font-semibold text-slate-300">Endpoints</span>
+  {baseUrl && (
+    <span className="text-xs text-slate-500 font-mono">{baseUrl}</span>
+  )}
+</div>
+```
+
+### Rows
+
+Each row displays:
+1. **HTTP Method Badge** - Fixed minimum width of 60px
+2. **Endpoint Path** - Flex-1 to fill available space
+3. **Label** (optional) - Hidden on small screens
+
+## Styling
+
+- **Container**: `bg-slate-950` with `border-white/10`
+- **Border radius**: `rounded-xl`
+- **Row dividers**: `divide-y divide-white/5`
+- **Hover effect**: `hover:bg-white/[0.02]`
+- **Padding**: `px-4 py-3` per row
+
+## Method Badge Styling
+
+```tsx
+<span
+  className={`px-2 py-1 text-xs font-bold rounded min-w-[60px] text-center ${methodColors[endpoint.method]}`}
+>
+  {endpoint.method}
+</span>
+```
+
+- Fixed minimum width for alignment
+- Center-aligned text
+- Bold font weight
+- Rounded corners
+
+## Responsive Behavior
+
+### Label Visibility
+
+Labels are hidden on small screens to save space:
+
+```tsx
+{endpoint.label && (
+  <span className="text-xs text-slate-500 hidden sm:block">
+    {endpoint.label}
+  </span>
+)}
+```
+
+- **Mobile**: Labels hidden
+- **Desktop (sm+)**: Labels visible
+
+## Layout
+
+Each row uses flexbox for alignment:
+
+```tsx
+<div className="flex items-center gap-4 px-4 py-3 hover:bg-white/[0.02] transition-colors">
+  {/* Method badge - fixed width */}
+  {/* Path - flexible */}
+  {/* Label - auto width */}
+</div>
+```
+
+## Example: Complete API
+
+```tsx
+const inventoryApiEndpoints = [
+  { method: "GET", path: "/items", label: "List inventory items" },
+  { method: "POST", path: "/items", label: "Create item" },
+  { method: "GET", path: "/items/{id}", label: "Get item by ID" },
+  { method: "PUT", path: "/items/{id}", label: "Update item" },
+  { method: "DELETE", path: "/items/{id}", label: "Deactivate item" },
+  { method: "GET", path: "/warehouses", label: "List warehouses" },
+  { method: "GET", path: "/inventory/balances", label: "Get stock balances" },
+  { method: "POST", path: "/inventory/receipt", label: "Record stock receipt" },
+  { method: "POST", path: "/transfers", label: "Create transfer" },
+  { method: "POST", path: "/transfers/{id}/ship", label: "Ship transfer" },
+];
+
+<EndpointsTable 
+  endpoints={inventoryApiEndpoints} 
+  baseUrl="/v1" 
+/>;
+```
+
+## Accessibility
+
+- Semantic HTML structure
+- Sufficient color contrast for all text
+- Clear visual hierarchy
+- Keyboard navigation support
+- Screen reader friendly content
+
+## Best Practices
+
+1. **Keep labels concise** - Use clear, action-oriented descriptions
+2. **Use RESTful paths** - Follow standard REST conventions
+3. **Group related endpoints** - Order logically by resource
+4. **Include all CRUD operations** - Show complete API coverage
+5. **Use path parameters consistently** - Stick to `{id}` convention

@@ -1,0 +1,267 @@
+---
+title: 'Design System'
+description: 'Color palette, typography, and design tokens for consistent styling'
+---
+
+## Color Palette
+
+The portfolio uses a modern dark theme with emerald green as the primary accent color.
+
+### Primary Colors
+
+The emerald color scheme creates a professional, tech-focused aesthetic:
+
+```css
+/* Emerald color palette */
+--primary: #10b981;        /* emerald-500 */
+--primary-dark: #059669;   /* emerald-600 */
+--primary-light: #34d399;  /* emerald-400 */
+```
+
+<Card title="Primary Emerald" icon="palette">
+**HEX:** `#10b981` | **RGB:** `rgb(16, 185, 129)`
+
+Used for: Buttons, links, highlights, hover states, brand accents
+</Card>
+
+### Background Colors
+
+Dark backgrounds create contrast and reduce eye strain:
+
+```css
+/* Background colors */
+--background-light: #f6f6f8;  /* Light mode (optional) */
+--background-dark: #101622;   /* Main dark background */
+--navy-dark: #0a192f;         /* Alternative dark background */
+```
+
+### Surface Colors
+
+Layered surfaces create depth and hierarchy:
+
+```css
+/* Surface colors */
+--surface-dark: #1a2333;      /* Cards and containers */
+--surface-darker: #0a0f18;    /* Deeper layers */
+--border-color: #232f48;      /* Borders and dividers */
+```
+
+## Typography
+
+### Font Family
+
+The portfolio uses **Space Grotesk**, a modern geometric sans-serif font:
+
+```css
+body {
+  font-family: "Space Grotesk", sans-serif;
+}
+```
+
+**Space Grotesk** provides:
+- Clean, professional appearance
+- Excellent readability at all sizes
+- Technical aesthetic perfect for developer portfolios
+- Good support for both headings and body text
+
+### Font Loading
+
+The font is loaded through Next.js Font Optimization:
+
+```tsx
+import { Space_Grotesk } from 'next/font/google';
+
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] });
+```
+
+### Typography Scale
+
+Tailwind's default typography scale is used throughout:
+
+```tsx
+// Headings
+<h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">
+<h2 className="text-3xl md:text-4xl font-bold">
+<h3 className="text-2xl md:text-3xl font-semibold">
+
+// Body text
+<p className="text-base text-slate-300">
+<span className="text-sm font-medium">
+```
+
+## Design Tokens
+
+### Spacing
+
+The portfolio uses Tailwind's spacing scale (based on 0.25rem/4px increments):
+
+```tsx
+// Common spacing patterns
+className="px-4 md:px-20 lg:px-40"  // Responsive horizontal padding
+className="py-3"                     // Vertical padding
+className="gap-4 md:gap-8"          // Flexbox/Grid gaps
+className="mt-8"                     // Top margin
+```
+
+### Border Radius
+
+Consistent border radius creates cohesive visual style:
+
+```tsx
+className="rounded-lg"     // 0.5rem - Buttons, cards
+className="rounded-xl"     // 0.75rem - Larger cards
+className="rounded-2xl"    // 1rem - Images, featured content
+className="rounded-full"   // Complete circle - Icons, badges
+```
+
+### Transitions
+
+Standard transition timing for interactive elements:
+
+```css
+transition: all 0.3s ease;
+```
+
+```tsx
+className="transition-colors"           // Color transitions
+className="transition-all"              // All properties
+className="transition-transform"        // Transform only
+```
+
+## Custom Classes
+
+### Glass Card Effect
+
+Modern glassmorphism effect for cards:
+
+```css
+.glass-card {
+  background: rgba(35, 47, 72, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card:hover {
+  border-color: rgba(16, 185, 129, 0.5);
+}
+```
+
+**Usage:**
+```tsx
+<div className="glass-card rounded-xl p-6">
+  Card content
+</div>
+```
+
+### Tech Badge
+
+Styled badges for technology tags:
+
+```css
+.tech-badge {
+  background: rgba(16, 22, 34, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+  transition: all 0.3s ease;
+}
+
+.tech-badge:hover {
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+  transform: translateY(-2px) scale(1.02);
+}
+```
+
+**Usage:**
+```tsx
+<span className="tech-badge px-3 py-1 rounded-full text-sm">
+  TypeScript
+</span>
+```
+
+### Process Step
+
+Hover effects for process/timeline steps:
+
+```css
+.process-step {
+  transition: all 0.3s ease;
+}
+
+.process-step:hover {
+  border-color: rgba(16, 185, 129, 0.5);
+}
+```
+
+## Custom Scrollbar
+
+Branded scrollbar styling:
+
+```css
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+```
+
+## Text Selection
+
+Custom selection color matching brand:
+
+```css
+::selection {
+  background: rgba(16, 185, 129, 0.3);
+  color: #ffffff;
+}
+```
+
+## Color Usage Guidelines
+
+### Do's
+- Use emerald (`#10b981`) for primary actions and highlights
+- Use slate colors (`slate-300`, `slate-400`) for secondary text
+- Maintain dark backgrounds for consistent theme
+- Use white (`#ffffff`) for primary text on dark backgrounds
+
+### Don'ts
+- Avoid mixing emerald with other bright accent colors
+- Don't use pure black `#000000` - use dark navy instead
+- Avoid low contrast text combinations
+- Don't override custom scrollbar without careful consideration
+
+## Accessibility
+
+### Color Contrast
+
+All color combinations meet WCAG 2.1 AA standards:
+
+- White text (`#ffffff`) on dark backgrounds: AAA compliance
+- Emerald (`#10b981`) on dark backgrounds: AA compliance for large text
+- Slate text (`#cbd5e1`) on dark backgrounds: AA compliance
+
+### Focus States
+
+All interactive elements include visible focus states:
+
+```tsx
+className="focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-[#101622]"
+```
+
+## Related Documentation
+
+- [Tailwind Setup](/styling/tailwind-setup) - Configuration details
+- [Animations](/styling/animations) - Motion and transitions

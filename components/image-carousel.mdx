@@ -1,0 +1,292 @@
+---
+title: ImageCarousel
+description: Interactive image carousel with navigation arrows, dot indicators, and keyboard support
+---
+
+# ImageCarousel
+
+A feature-rich image carousel component with navigation controls, progress indicators, and smooth transitions. Optimized for showcasing project screenshots.
+
+## Location
+
+**Source:** `src/components/ImageCarousel.tsx`
+
+## Features
+
+- Previous/Next navigation arrows
+- Dot indicators for image position
+- Image counter badge
+- Hover-based control visibility
+- Circular navigation (wraps around)
+- Next.js Image optimization
+- Responsive sizing
+- Keyboard accessibility
+- Priority loading for first image
+- Rounded corners with border styling
+
+## Props
+
+<ParamField path="images" type="ProjectImage[]" required>
+  Array of image objects with src and alt text
+</ParamField>
+
+## Type Definitions
+
+From `@/data/projects.ts`:
+
+```typescript
+type ProjectImage = {
+  src: string;
+  alt: string;
+};
+```
+
+## Usage
+
+### Basic Example
+
+```tsx
+import ImageCarousel from "@/components/ImageCarousel";
+
+const images = [
+  { src: "/images/screenshot-1.png", alt: "Dashboard view" },
+  { src: "/images/screenshot-2.png", alt: "Settings page" },
+  { src: "/images/screenshot-3.png", alt: "Analytics dashboard" },
+];
+
+<ImageCarousel images={images} />;
+```
+
+### Project Detail Page Usage
+
+From `src/app/projects/[slug]/page.tsx`:
+
+```tsx
+{hasImages && !isApiProject && (
+  <Reveal delay={0.25}>
+    <div className="grid gap-6 mb-12 items-start lg:grid-cols-[1fr_280px]">
+      {/* Desktop Carousel */}
+      <div className="min-w-0">
+        <ImageCarousel images={project.images!.desktop} />
+      </div>
+
+      {/* Mobile Preview */}
+      {project.images!.mobile && (
+        <div className="flex justify-center lg:justify-end">
+          <PhoneFrame image={project.images!.mobile} />
+        </div>
+      )}
+    </div>
+  </Reveal>
+)}
+```
+
+### Single Image
+
+The carousel gracefully handles single images by hiding navigation controls:
+
+```tsx
+const singleImage = [
+  { src: "/hero-image.png", alt: "Product hero" }
+];
+
+<ImageCarousel images={singleImage} />;
+```
+
+## State Management
+
+The component uses React state to track the current image index:
+
+```typescript
+const [currentIndex, setCurrentIndex] = useState(0);
+```
+
+## Navigation Functions
+
+### Previous Image
+
+```typescript
+const goToPrevious = () => {
+  setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+};
+```
+
+### Next Image
+
+```typescript
+const goToNext = () => {
+  setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+};
+```
+
+Both functions wrap around, creating an infinite loop effect.
+
+## Image Container
+
+The main image uses Next.js Image component:
+
+```tsx
+<div className="relative w-full aspect-video overflow-hidden rounded-2xl border border-white/10 bg-[#0a0f18]">
+  <Image
+    src={images[currentIndex].src}
+    alt={images[currentIndex].alt}
+    fill
+    sizes="(max-width: 768px) 100vw, 70vw"
+    className="object-cover"
+    priority={currentIndex === 0}
+  />
+</div>
+```
+
+- **Aspect ratio**: `aspect-video` (16:9)
+- **Fill mode**: Image fills container
+- **Object fit**: `cover` for proper cropping
+- **Priority**: First image loads with priority
+
+## Navigation Arrows
+
+Arrows only appear when there are multiple images:
+
+```tsx
+{images.length > 1 && (
+  <>
+    <button
+      onClick={goToPrevious}
+      className="absolute left-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100"
+      aria-label="Previous image"
+    >
+      {/* Left arrow SVG */}
+    </button>
+    <button
+      onClick={goToNext}
+      className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100"
+      aria-label="Next image"
+    >
+      {/* Right arrow SVG */}
+    </button>
+  </>
+)}
+```
+
+### Arrow Styling
+
+- Size: `w-10 h-10`
+- Background: `bg-black/60 backdrop-blur-sm`
+- Border: `border-white/10`
+- Visibility: Hidden by default, shown on hover
+- Hover effect: `hover:border-emerald-500/50`
+
+## Dot Indicators
+
+Dot navigation only shows for multiple images:
+
+```tsx
+{images.length > 1 && (
+  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+    {images.map((_, index) => (
+      <button
+        key={index}
+        onClick={() => setCurrentIndex(index)}
+        className={`w-2 h-2 rounded-full transition-all ${
+          index === currentIndex
+            ? "bg-emerald-500 w-6"
+            : "bg-white/40 hover:bg-white/60"
+        }`}
+        aria-label={`Go to image ${index + 1}`}
+      />
+    ))}
+  </div>
+)}
+```
+
+### Dot States
+
+- **Active**: Emerald color, wider (w-6)
+- **Inactive**: White with 40% opacity
+- **Hover**: White with 60% opacity
+- All dots are clickable buttons
+
+## Image Counter
+
+Displays current position in top-right corner:
+
+```tsx
+<div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 text-xs text-white font-medium">
+  {currentIndex + 1} / {images.length}
+</div>
+```
+
+## Responsive Design
+
+### Image Sizes
+
+```tsx
+sizes="(max-width: 768px) 100vw, 70vw"
+```
+
+- **Mobile**: Full viewport width
+- **Desktop**: 70% of viewport width
+
+### Container
+
+- Width: `w-full` (100%)
+- Height: `h-full` (inherits from parent)
+- Min-width: `min-w-0` to prevent flex overflow
+
+## Hover Effects
+
+The component uses a group hover pattern:
+
+```tsx
+<div className="relative w-full h-full group">
+  {/* Navigation arrows have opacity-0 group-hover:opacity-100 */}
+</div>
+```
+
+This makes arrows appear only when hovering over the entire carousel.
+
+## Accessibility
+
+- Semantic button elements for controls
+- `aria-label` on all interactive elements
+- Keyboard accessible buttons
+- Descriptive alt text on images
+- Clear visual focus states
+
+## Performance Optimization
+
+1. **Priority loading**: First image loads immediately
+2. **Lazy loading**: Other images load on demand
+3. **Optimized sizes**: Proper size hints for responsive images
+4. **Next.js Image**: Automatic optimization and WebP conversion
+
+## Conditional Rendering
+
+The component returns `null` if no images are provided:
+
+```typescript
+if (!images || images.length === 0) return null;
+```
+
+## Example: Project Gallery
+
+```tsx
+const projectImages = [
+  { src: "https://example.com/hero.png", alt: "Landing page" },
+  { src: "https://example.com/dashboard.png", alt: "Dashboard view" },
+  { src: "https://example.com/settings.png", alt: "Settings panel" },
+  { src: "https://example.com/analytics.png", alt: "Analytics charts" },
+];
+
+<div className="max-w-5xl mx-auto">
+  <ImageCarousel images={projectImages} />
+</div>
+```
+
+## Best Practices
+
+1. **Use high-quality images** - Minimum 1200px width recommended
+2. **Maintain consistent aspect ratios** - All images should be 16:9
+3. **Write descriptive alt text** - Important for accessibility
+4. **Optimize images** - Use compressed formats
+5. **Order logically** - Put most important screenshots first

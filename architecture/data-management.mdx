@@ -1,0 +1,569 @@
+---
+title: Data Management
+description: Project data structure and TypeScript type definitions
+---
+
+## Overview
+
+All portfolio project data is centralized in **`src/data/projects.ts`**. This file serves as the single source of truth for:
+
+- Project metadata and content
+- TypeScript type definitions
+- Helper functions for data retrieval
+
+This data-driven approach allows adding/editing projects without modifying components or pages.
+
+---
+
+## Type Definitions
+
+### Core Types
+
+#### ProjectImage
+
+```typescript
+export type ProjectImage = {
+  src: string;     // URL or path to image
+  alt: string;     // Accessibility description
+};
+```
+
+**Usage**: Desktop screenshots, mobile screenshots
+
+**Example**:
+```typescript
+{
+  src: "https://9jaubfal4qpj0a4o.public.blob.vercel-storage.com/booking/hero.png",
+  alt: "Booking platform landing page"
+}
+```
+
+---
+
+#### TechCategory
+
+```typescript
+export type TechCategory = {
+  category: string;           // Category name (e.g., "Frontend", "Backend")
+  technologies: string[];     // List of technologies
+};
+```
+
+**Usage**: Grouped tech stack display in project details
+
+**Example**:
+```typescript
+{
+  category: "Frontend",
+  technologies: ["Blazor Server", "MudBlazor", "MudBlazor.Extensions"]
+}
+```
+
+---
+
+#### Challenge
+
+```typescript
+export type Challenge = {
+  title: string;      // Problem statement
+  solution: string;   // How it was solved
+};
+```
+
+**Usage**: Technical challenges section in project case studies
+
+**Example**:
+```typescript
+{
+  title: "State consistency between steps",
+  solution: "Centralized state service (BookingStateService) to maintain booking data"
+}
+```
+
+---
+
+### API-Specific Types
+
+#### HttpMethod
+
+```typescript
+export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+```
+
+**Usage**: Type-safe HTTP method declarations
+
+---
+
+#### Endpoint
+
+```typescript
+export type Endpoint = {
+  method: HttpMethod;   // HTTP method
+  path: string;         // Endpoint path
+  label?: string;       // Optional description
+};
+```
+
+**Usage**: API endpoint definitions
+
+**Example**:
+```typescript
+{
+  method: "GET",
+  path: "/items",
+  label: "List inventory items"
+}
+```
+
+---
+
+#### ApiPreview
+
+```typescript
+export type ApiPreview = {
+  baseUrl?: string;       // Base URL (e.g., "/v1")
+  endpoints: Endpoint[];  // List of endpoints
+};
+```
+
+**Usage**: Terminal-style API preview in project cards and detail pages
+
+---
+
+#### SampleRequest
+
+```typescript
+export type SampleRequest = {
+  method: string;      // HTTP method
+  endpoint: string;    // Full endpoint path
+  headers?: string;    // Request headers (formatted)
+  body?: string;       // Request body JSON
+  response?: string;   // Response body JSON
+};
+```
+
+**Usage**: Code block examples in API project details
+
+**Example**:
+```typescript
+{
+  method: "POST",
+  endpoint: "/v1/items",
+  headers: "Authorization: Bearer <token>\nContent-Type: application/json",
+  body: `{
+  "sku": "WIDGET-001",
+  "name": "Industrial Widget",
+  "costPrice": 15.50
+}`,
+  response: `{
+  "id": "770e8400-e29b-41d4-a716-446655440002",
+  "sku": "WIDGET-001",
+  "isActive": true
+}`
+}
+```
+
+---
+
+### Main Project Type
+
+#### Project
+
+```typescript
+export type Project = {
+  // REQUIRED FIELDS
+  slug: string;               // URL-friendly identifier
+  title: string;              // Project name
+  description: string;        // Short description (1-2 sentences)
+  stack: string[];            // Technology tags (simple list)
+  highlights: string[];       // Key features/accomplishments
+
+  // OPTIONAL MEDIA
+  images?: {
+    desktop: ProjectImage[];  // Desktop screenshots (first = preview)
+    mobile?: ProjectImage;    // Single mobile screenshot
+  };
+  repo?: string;              // GitHub repository URL
+  live?: string;              // Live demo URL
+
+  // DISPLAY TYPE
+  displayType?: "webapp" | "api";
+
+  // EXTENDED METADATA
+  status?: "completed" | "in-progress" | "maintenance";
+  role?: string;              // Your role (e.g., "Full-Stack Developer")
+  projectType?: string;       // Type (e.g., "Enterprise Web App")
+  keyOutput?: string;         // Main deliverable
+
+  // CASE STUDY SECTIONS
+  problem?: string;           // Problem statement
+  solution?: string;          // Solution approach
+  result?: string;            // Outcome/impact
+
+  // TECHNICAL DETAILS
+  stackDetails?: TechCategory[];   // Grouped tech stack
+  architecture?: string[];         // Architecture patterns
+  challenges?: Challenge[];        // Technical challenges
+  lessonsLearned?: string[];       // Key takeaways
+
+  // API-SPECIFIC FIELDS
+  apiPreview?: ApiPreview;         // Endpoint preview
+  capabilities?: string[];         // API capabilities (badges)
+  sampleRequest?: SampleRequest;   // Example request/response
+};
+```
+
+---
+
+## Data Structure
+
+### Project Array
+
+```typescript
+export const projects: Project[] = [
+  { /* booking-platform */ },
+  { /* payroll-platform */ },
+  { /* inventory-api */ },
+];
+```
+
+**Current Projects**:
+1. `booking-platform` - Refugio del Sol Booking Platform (Blazor)
+2. `payroll-platform` - Payroll Management System (.NET 8 MVC)
+3. `inventory-api` - Multi-tenant Inventory API (ASP.NET Core)
+
+---
+
+## Helper Functions
+
+### getProjectBySlug
+
+```typescript
+export function getProjectBySlug(slug: string): Project | undefined {
+  return projects.find((project) => project.slug === slug);
+}
+```
+
+**Usage**: Fetch project data in dynamic route
+
+```typescript
+const project = getProjectBySlug("booking-platform");
+if (!project) notFound();
+```
+
+---
+
+### getAllSlugs
+
+```typescript
+export function getAllSlugs(): string[] {
+  return projects.map((project) => project.slug);
+}
+```
+
+**Usage**: Generate static paths at build time
+
+```typescript
+export async function generateStaticParams() {
+  const slugs = getAllSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
+```
+
+**Output**:
+```typescript
+[
+  { slug: "booking-platform" },
+  { slug: "payroll-platform" },
+  { slug: "inventory-api" }
+]
+```
+
+---
+
+## Real Project Example
+
+Here's the complete data structure for the Inventory API project:
+
+```typescript
+{
+  slug: "inventory-api",
+  title: "Inventory API",
+  displayType: "api",
+  description: "Multi-tenant RESTful API for inventory management with ledger-based tracking, warehouse transfers, and stock reservations following Clean Architecture.",
+  
+  stack: ["ASP.NET Core", "PostgreSQL", "Docker", "EF Core", "JWT"],
+  
+  highlights: [
+    "Clean Architecture with 4 layers",
+    "Multi-tenant isolation via JWT claims",
+    "Ledger-based inventory tracking",
+    "Transfer state machine (Draft → Received)",
+    "Stock reservation system with expiration",
+    "Idempotency keys for safe retries",
+  ],
+  
+  repo: "https://github.com/merg8511/Inventory.Api",
+  
+  status: "completed",
+  role: "Backend Developer",
+  projectType: "REST API Service",
+  keyOutput: "OpenAPI + Docker Image",
+  
+  problem: "Companies managing inventory across multiple warehouses need a reliable system to track stock movements, handle inter-warehouse transfers, reserve stock for orders, and maintain an immutable audit trail of all transactions.",
+  
+  solution: "Built a multi-tenant REST API with .NET 10 following Clean Architecture. Implemented ledger-based tracking for auditing, a state machine for transfers, and reservation management with automatic tenant isolation.",
+  
+  result: "Production-ready API with multi-tenant support, comprehensive transaction history, automated health checks, and Docker deployment ready for cloud environments.",
+  
+  stackDetails: [
+    { 
+      category: "Runtime", 
+      technologies: [".NET 10", "Minimal APIs", "C# 13"] 
+    },
+    { 
+      category: "Data", 
+      technologies: ["PostgreSQL 16", "EF Core 9", "Npgsql"] 
+    },
+    { 
+      category: "Auth", 
+      technologies: ["JWT Bearer", "Policy-based Authorization", "Multi-tenant Claims"] 
+    },
+    { 
+      category: "DevOps", 
+      technologies: ["Docker", "Health Checks", "OpenTelemetry", "Serilog"] 
+    },
+  ],
+  
+  architecture: [
+    "Clean Architecture (Domain, Application, Infrastructure, API)",
+    "Service Pattern with Interface Contracts",
+    "Result Pattern for Error Handling",
+    "Tenant Isolation via Global Query Filters",
+  ],
+  
+  capabilities: [
+    "JWT Authentication",
+    "Scope-based Authorization",
+    "Pagination & Filtering",
+    "OpenAPI/Swagger Documentation",
+    "FluentValidation",
+    "Rate Limiting",
+    "Health Checks (Liveness/Readiness)",
+    "Structured Logging with Correlation IDs",
+    "Idempotency Keys",
+    "OpenTelemetry Tracing",
+  ],
+  
+  apiPreview: {
+    baseUrl: "/v1",
+    endpoints: [
+      { method: "GET", path: "/items", label: "List inventory items" },
+      { method: "POST", path: "/items", label: "Create item" },
+      { method: "GET", path: "/items/{id}", label: "Get item by ID" },
+      { method: "PUT", path: "/items/{id}", label: "Update item" },
+      { method: "DELETE", path: "/items/{id}", label: "Deactivate item" },
+      { method: "GET", path: "/warehouses", label: "List warehouses" },
+      { method: "GET", path: "/inventory/balances", label: "Get stock balances" },
+      { method: "POST", path: "/inventory/receipt", label: "Record stock receipt" },
+      { method: "POST", path: "/inventory/issue", label: "Record stock issue" },
+      { method: "POST", path: "/transfers", label: "Create transfer" },
+      { method: "POST", path: "/transfers/{id}/commit", label: "Commit transfer" },
+      { method: "POST", path: "/transfers/{id}/ship", label: "Ship transfer" },
+      { method: "POST", path: "/transfers/{id}/receive", label: "Receive transfer" },
+      { method: "POST", path: "/reservations", label: "Create reservation" },
+      { method: "POST", path: "/reservations/{id}/confirm", label: "Confirm reservation" },
+    ]
+  },
+  
+  sampleRequest: {
+    method: "POST",
+    endpoint: "/v1/items",
+    headers: "Authorization: Bearer <token>\nContent-Type: application/json",
+    body: `{
+  "sku": "WIDGET-001",
+  "name": "Industrial Widget",
+  "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+  "unitOfMeasureId": "660e8400-e29b-41d4-a716-446655440001",
+  "costPrice": 15.50,
+  "salePrice": 24.99,
+  "trackingType": "None"
+}`,
+    response: `{
+  "id": "770e8400-e29b-41d4-a716-446655440002",
+  "sku": "WIDGET-001",
+  "name": "Industrial Widget",
+  "categoryId": "550e8400-e29b-41d4-a716-446655440000",
+  "costPrice": 15.50,
+  "salePrice": 24.99,
+  "isActive": true,
+  "createdAt": "2024-01-15T10:30:00Z"
+}`
+  },
+  
+  challenges: [
+    { 
+      title: "Multi-tenant isolation", 
+      solution: "JWT claims + EF Core global query filters for automatic tenant filtering" 
+    },
+    { 
+      title: "Transfer workflow complexity", 
+      solution: "State machine pattern with domain methods (Draft → Committed → InTransit → Received)" 
+    },
+    { 
+      title: "Stock consistency", 
+      solution: "Ledger-based transactions with immutable history and optimistic concurrency (RowVersion)" 
+    },
+    { 
+      title: "Idempotent operations", 
+      solution: "Idempotency-Key header with database persistence for safe retries" 
+    },
+  ],
+  
+  lessonsLearned: [
+    "Implementing multi-tenant architecture with EF Core global filters",
+    "Designing ledger-based inventory systems for auditability",
+    "Building state machines for complex workflow management",
+    "Applying Clean Architecture in .NET Minimal APIs",
+  ],
+}
+```
+
+---
+
+## Adding a New Project
+
+To add a new project to the portfolio:
+
+### 1. Add project object to array
+
+```typescript
+export const projects: Project[] = [
+  // ... existing projects
+  {
+    slug: "my-new-project",
+    title: "My New Project",
+    description: "A brief description",
+    stack: ["Next.js", "TypeScript"],
+    highlights: [
+      "Feature 1",
+      "Feature 2",
+    ],
+    images: {
+      desktop: [
+        { src: "/images/project.png", alt: "Screenshot" }
+      ]
+    },
+  },
+];
+```
+
+### 2. (Optional) Upload images to Vercel Blob
+
+Images are hosted on Vercel Blob Storage:
+```
+https://9jaubfal4qpj0a4o.public.blob.vercel-storage.com/
+```
+
+### 3. Rebuild the site
+
+```bash
+npm run build
+```
+
+Next.js will automatically:
+- Generate a new static page at `/projects/my-new-project`
+- Update the projects listing page
+- Include it in the homepage preview
+
+---
+
+## Data Validation
+
+### Required Fields
+
+Minimum data for a valid project:
+
+```typescript
+{
+  slug: "unique-slug",      // ✅ Required
+  title: "Project Name",     // ✅ Required
+  description: "...",        // ✅ Required
+  stack: ["Tech1"],          // ✅ Required
+  highlights: ["Feature"],   // ✅ Required
+}
+```
+
+### Recommended Fields
+
+For a complete project showcase:
+
+```typescript
+{
+  // ... required fields
+  displayType: "webapp" | "api",
+  images: { desktop: [...], mobile: {...} },
+  repo: "https://github.com/...",
+  status: "completed",
+  problem: "...",
+  solution: "...",
+  result: "...",
+  stackDetails: [...],
+  architecture: [...],
+  challenges: [...],
+  lessonsLearned: [...],
+}
+```
+
+---
+
+## Type Safety Benefits
+
+### 1. Autocomplete in IDEs
+
+TypeScript provides IntelliSense for all project properties:
+
+```typescript
+const project = getProjectBySlug("booking-platform");
+project?.  // IDE suggests: slug, title, description, stack, etc.
+```
+
+### 2. Compile-time Error Detection
+
+```typescript
+// ❌ Error: Type '"INVALID"' is not assignable to type 'HttpMethod'
+{ method: "INVALID", path: "/test" }
+
+// ✅ Valid
+{ method: "GET", path: "/test" }
+```
+
+### 3. Refactoring Safety
+
+Renaming a type property automatically updates all usages or shows errors.
+
+---
+
+## Best Practices
+
+1. **Keep descriptions concise** (1-2 sentences max)
+2. **Use action verbs** for highlights ("Built", "Implemented", "Designed")
+3. **Order images logically** (hero shot first, then features)
+4. **Group technologies** in `stackDetails` by logical categories
+5. **Write challenges** as problem → solution pairs
+6. **Make slugs URL-friendly** (lowercase, hyphens, no spaces)
+7. **Host images externally** (Vercel Blob, Cloudinary, etc.)
+
+---
+
+## Future Enhancements
+
+Potential additions to the data structure:
+
+- **Tags/Categories**: For filtering projects by domain
+- **Date Fields**: Project start/end dates
+- **Client Info**: Company name, industry
+- **Metrics**: Performance improvements, user counts
+- **Videos**: Demo video URLs
+- **Testimonials**: Client quotes
+- **Related Projects**: Cross-linking between projects

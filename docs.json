@@ -1,122 +1,85 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Mario Rodriguez Portfolio",
+  "theme": "palm",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
-  },
-  "favicon": "/favicon.svg",
-  "navigation": {
-    "tabs": [
-      {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
-          }
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "primary": "#10b981",
+    "light": "#34d399",
+    "dark": "#059669"
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
     "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "type": "github",
+      "href": "https://github.com/merg8511/portafolio"
     }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/merg8511/portafolio"
     }
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "introduction",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Project Structure",
+        "pages": [
+          "architecture/overview",
+          "architecture/routing",
+          "architecture/components",
+          "architecture/data-management"
+        ]
+      },
+      {
+        "group": "Components",
+        "pages": [
+          "components/navbar",
+          "components/footer",
+          "components/api-preview-card",
+          "components/code-block",
+          "components/endpoints-table",
+          "components/image-carousel",
+          "components/phone-frame",
+          "components/reveal"
+        ]
+      },
+      {
+        "group": "Pages",
+        "pages": [
+          "pages/home",
+          "pages/about",
+          "pages/projects",
+          "pages/project-detail",
+          "pages/contact"
+        ]
+      },
+      {
+        "group": "API Routes",
+        "pages": [
+          "api/contact-endpoint"
+        ]
+      },
+      {
+        "group": "Styling & Design",
+        "pages": [
+          "styling/tailwind-setup",
+          "styling/design-system",
+          "styling/animations"
+        ]
+      },
+      {
+        "group": "Deployment",
+        "pages": [
+          "deployment/vercel",
+          "deployment/environment-variables"
+        ]
+      }
+    ]
   }
 }

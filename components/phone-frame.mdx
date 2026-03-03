@@ -1,0 +1,259 @@
+---
+title: PhoneFrame
+description: Mobile device frame component for showcasing mobile app screenshots
+---
+
+# PhoneFrame
+
+A realistic phone frame component that displays mobile screenshots in a modern smartphone bezel with rounded corners, notch simulation, and subtle glow effects.
+
+## Location
+
+**Source:** `src/components/PhoneFrame.tsx`
+
+## Features
+
+- Realistic smartphone bezel design
+- Rounded corners with proper border radius
+- Home indicator bar at bottom
+- Glow/reflection effect
+- Next.js Image optimization
+- Fixed aspect ratio (9:19.5)
+- Responsive sizing with max constraints
+- Dark theme styling
+
+## Props
+
+<ParamField path="image" type="ProjectImage" required>
+  Single image object with src and alt text for the mobile screenshot
+</ParamField>
+
+## Type Definitions
+
+From `@/data/projects.ts`:
+
+```typescript
+type ProjectImage = {
+  src: string;
+  alt: string;
+};
+```
+
+## Usage
+
+### Basic Example
+
+```tsx
+import PhoneFrame from "@/components/PhoneFrame";
+
+const mobileScreenshot = {
+  src: "/images/mobile-app.png",
+  alt: "Mobile app home screen"
+};
+
+<PhoneFrame image={mobileScreenshot} />;
+```
+
+### Project Detail Page Usage
+
+From `src/app/projects/[slug]/page.tsx`:
+
+```tsx
+<div className="grid gap-6 mb-12 items-start lg:grid-cols-[1fr_280px]">
+  {/* Desktop Carousel */}
+  <div className="min-w-0">
+    <ImageCarousel images={project.images!.desktop} />
+  </div>
+
+  {/* Mobile Preview */}
+  {project.images!.mobile && (
+    <div className="flex justify-center lg:justify-end">
+      <PhoneFrame image={project.images!.mobile} />
+    </div>
+  )}
+</div>
+```
+
+### Centered Display
+
+```tsx
+<div className="flex justify-center py-12">
+  <PhoneFrame image={mobileScreenshot} />
+</div>
+```
+
+## Container Sizing
+
+The component has built-in size constraints:
+
+```tsx
+<div className="relative w-full max-w-[240px] h-full max-h-[500px] mx-auto">
+  {/* Phone content */}
+</div>
+```
+
+- **Max width**: 240px
+- **Max height**: 500px
+- **Default**: Centered with `mx-auto`
+
+## Phone Bezel
+
+The outer bezel simulates a modern smartphone:
+
+```tsx
+<div className="relative bg-[#1a1a1a] rounded-[3rem] p-2 shadow-2xl shadow-black/50 border border-white/10">
+  {/* Screen and content */}
+</div>
+```
+
+- Background: Dark gray (`#1a1a1a`)
+- Border radius: `3rem` for rounded device edges
+- Shadow: Large, dark shadow for depth
+- Border: Subtle white border with 10% opacity
+- Padding: `p-2` to create bezel thickness
+
+## Screen Area
+
+The inner screen area contains the actual image:
+
+```tsx
+<div className="relative aspect-[9/19.5] overflow-hidden rounded-[1.5rem] bg-[#0a0f18] mt-2">
+  <Image
+    src={image.src}
+    alt={image.alt}
+    fill
+    sizes="240px"
+    className="object-contain object-top"
+  />
+</div>
+```
+
+### Screen Properties
+
+- **Aspect ratio**: `9/19.5` (modern smartphone proportion)
+- **Border radius**: `1.5rem` for rounded screen corners
+- **Background**: Dark blue-gray (`#0a0f18`)
+- **Top margin**: `mt-2` to simulate notch/camera area
+- **Object fit**: `contain` to preserve image aspect ratio
+- **Object position**: `top` to align image at top of screen
+
+## Image Sizing
+
+```tsx
+sizes="240px"
+```
+
+Fixed size hint matches the component's max-width for optimal loading.
+
+## Home Indicator
+
+Simulates the iOS-style home indicator bar:
+
+```tsx
+<div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-white/20 rounded-full" />
+```
+
+- **Position**: Centered at bottom of bezel
+- **Size**: 128px wide, 4px tall
+- **Color**: White with 20% opacity
+- **Shape**: Fully rounded (`rounded-full`)
+
+## Glow Effect
+
+Subtle gradient glow behind the phone:
+
+```tsx
+<div className="absolute -inset-4 bg-gradient-to-b from-emerald-500/10 to-transparent rounded-[4rem] blur-2xl -z-10 opacity-50" />
+```
+
+- **Position**: Extends 4 units beyond phone on all sides
+- **Gradient**: Emerald color fading to transparent
+- **Blur**: Heavy blur (`blur-2xl`) for soft glow
+- **Z-index**: Behind phone (`-z-10`)
+- **Opacity**: 50% for subtle effect
+
+## Layout Integration
+
+Typical use in a grid layout:
+
+```tsx
+<div className="grid gap-6 items-start lg:grid-cols-[1fr_280px]">
+  {/* Main content - 70% */}
+  <div className="min-w-0">
+    <ImageCarousel images={desktopImages} />
+  </div>
+
+  {/* Phone frame - 30% */}
+  <div className="flex justify-center lg:justify-end">
+    <PhoneFrame image={mobileImage} />
+  </div>
+</div>
+```
+
+## Responsive Behavior
+
+- **Mobile**: Phone frame centered, full width up to 240px
+- **Desktop**: Aligned to the right in grid layout
+- The component maintains its aspect ratio at all screen sizes
+
+## Styling Details
+
+### Shadow
+
+```css
+shadow-2xl shadow-black/50
+```
+
+Combines Tailwind's largest shadow with additional black shadow at 50% opacity.
+
+### Border Radius Progression
+
+- Outer bezel: `3rem`
+- Inner screen: `1.5rem`
+- Glow effect: `4rem`
+- Home indicator: `full`
+
+## Example: Booking App
+
+From the project data:
+
+```tsx
+const bookingProject = {
+  images: {
+    desktop: [
+      { src: "/booking/hero.png", alt: "Landing page" },
+      { src: "/booking/services.png", alt: "Services section" },
+    ],
+    mobile: { 
+      src: "/booking/mobile-booking.png", 
+      alt: "Mobile booking flow" 
+    }
+  }
+};
+
+// Usage
+<PhoneFrame image={bookingProject.images.mobile} />
+```
+
+## Best Practices
+
+1. **Use tall images** - Aim for aspect ratio close to 9:19.5
+2. **Align to top** - Important content should be at top of screenshot
+3. **Use high resolution** - Minimum 1080px height recommended
+4. **Show real content** - Avoid empty states or lorem ipsum
+5. **Capture full screens** - Include status bar and navigation
+
+## Accessibility
+
+- Descriptive alt text on image
+- Semantic HTML structure
+- Next.js Image optimization
+- Proper contrast ratios
+
+## Common Use Cases
+
+- Mobile app screenshots in portfolio
+- Responsive design showcases
+- Side-by-side desktop/mobile comparisons
+- Mobile-first project presentations
+- App store preview imagery

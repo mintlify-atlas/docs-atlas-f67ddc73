@@ -1,0 +1,142 @@
+---
+title: 'Tailwind CSS Setup'
+description: 'Tailwind CSS v4 configuration and PostCSS setup for the portfolio'
+---
+
+## Overview
+
+The Mario Rodriguez Portfolio uses **Tailwind CSS v4** with the new `@tailwindcss/postcss` plugin. This modern setup provides enhanced performance and a streamlined configuration experience.
+
+## Installation
+
+The portfolio uses the following Tailwind-related packages:
+
+```json
+{
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "tailwindcss": "^4"
+  }
+}
+```
+
+Install dependencies:
+
+```bash
+pnpm install
+```
+
+## PostCSS Configuration
+
+The PostCSS configuration uses the new Tailwind v4 plugin approach:
+
+**File:** `postcss.config.mjs`
+
+```javascript
+const config = {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+
+export default config;
+```
+
+<Note>
+Tailwind CSS v4 does not require a separate `tailwind.config.js` file. All configuration is done through CSS using the `@theme` directive.
+</Note>
+
+## CSS Import
+
+Tailwind is imported at the top of the global stylesheet:
+
+**File:** `src/app/globals.css`
+
+```css
+@import "tailwindcss";
+```
+
+This single import provides all Tailwind utilities, components, and base styles.
+
+## Theme Configuration
+
+The portfolio uses inline theme configuration in CSS using the `@theme` directive:
+
+```css
+@theme inline {
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-background: var(--background-dark);
+  --color-foreground: #ffffff;
+  --font-sans: "Space Grotesk", sans-serif;
+}
+```
+
+This approach allows you to:
+- Define custom colors that integrate with Tailwind's color system
+- Set up custom fonts as part of the theme
+- Use CSS variables for dynamic theming
+- Access these values through standard Tailwind classes
+
+## Build Process
+
+Tailwind CSS v4 automatically processes your styles during the Next.js build:
+
+```bash
+# Development mode with watch
+pnpm dev
+
+# Production build
+pnpm build
+```
+
+The PostCSS plugin handles:
+- CSS purging in production
+- Automatic vendor prefixing
+- Minification and optimization
+- Hot module reloading in development
+
+## Key Features
+
+### Modern Workflow
+- **No separate config file**: Configuration lives in your CSS
+- **Faster builds**: Improved processing speed
+- **Better DX**: Simplified setup and maintenance
+
+### CSS-First Configuration
+- Use `@theme` for theme customization
+- Define custom utilities in CSS
+- Better co-location of styles and configuration
+
+### Seamless Integration
+- Works out-of-the-box with Next.js 16
+- Full TypeScript support
+- Compatible with all Tailwind plugins
+
+## Usage in Components
+
+Import and use Tailwind classes directly in your components:
+
+```tsx
+export default function Button() {
+  return (
+    <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-colors">
+      Click me
+    </button>
+  );
+}
+```
+
+All custom theme values are accessible through standard Tailwind syntax:
+
+```tsx
+// Uses custom primary color from @theme
+<div className="text-primary bg-background">
+  Custom themed content
+</div>
+```
+
+## Related Documentation
+
+- [Design System](/styling/design-system) - Color palette and design tokens
+- [Animations](/styling/animations) - Framer Motion integration

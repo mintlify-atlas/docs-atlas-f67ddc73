@@ -1,0 +1,268 @@
+---
+title: About Page
+description: Documentation for the about page component
+---
+
+# About Page
+
+The about page (`src/app/about/page.tsx`) provides information about Mario Rodriguez's experience, technical skills, and professional approach to web development.
+
+## Page Structure
+
+The about page consists of three main sections:
+
+1. **Bio Section** - Personal introduction and development philosophy
+2. **Tech Stack Section** - Categorized list of technologies
+3. **Approach Section** - Core development principles
+
+## Metadata Configuration
+
+```tsx
+export const metadata: Metadata = {
+    title: "ABOUT",
+    description:
+        "Learn more about my experience, technical skills, and professional approach to web development.",
+};
+```
+
+The metadata is exported for Next.js App Router to generate proper page titles and meta tags.
+
+## Bio Section
+
+The bio section introduces the developer's background and expertise:
+
+```tsx
+<section className="mb-16">
+    <div className="max-w-3xl">
+        <p className="text-lg text-slate-400 leading-relaxed mb-6">
+            I'm a web developer with experience building modern and scalable
+            applications. My approach combines clean code, development best
+            practices, and attention to detail in every project.
+        </p>
+        <p className="text-lg text-slate-400 leading-relaxed">
+            I primarily work with the JavaScript/TypeScript ecosystem,
+            though I enjoy exploring new technologies that help solve
+            problems more efficiently.
+        </p>
+    </div>
+</section>
+```
+
+### Key Features:
+- **Max-width constraint** for optimal reading width (max-w-3xl)
+- **Relaxed leading** for comfortable reading
+- **Two-paragraph structure** separating philosophy and technical focus
+
+## Tech Stack Section
+
+Displays technologies organized by category in a responsive grid:
+
+```tsx
+const technologies = [
+    { category: "Frontend", items: ["React", "Next.js", "TypeScript", "Tailwind CSS"] },
+    { category: "Backend", items: ["Node.js", "Python", "PostgreSQL", "MongoDB"] },
+    { category: "Tools", items: ["Git", "Docker", "Vercel", "Figma"] },
+];
+```
+
+### Section Implementation
+
+```tsx
+<section className="mb-16">
+    <h2 className="text-sm font-medium tracking-widest text-slate-500 mb-8">
+        TECH STACK
+    </h2>
+    <div className="grid sm:grid-cols-3 gap-6">
+        {technologies.map((tech) => (
+            <div key={tech.category} className="p-6 bg-slate-900/50 border border-white/10 rounded-2xl">
+                <h3 className="font-semibold mb-4 text-cyan-400">{tech.category}</h3>
+                <ul className="space-y-2">
+                    {tech.items.map((item) => (
+                        <li key={item} className="text-slate-400 flex items-center gap-2">
+                            <span className="w-1 h-1 rounded-full bg-slate-600" />
+                            {item}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        ))}
+    </div>
+</section>
+```
+
+### Card Features:
+- **Glass morphism effect** with `bg-slate-900/50`
+- **Category headers** in cyan accent color
+- **Bullet points** using small circular spans
+- **3-column grid** on desktop, single column on mobile
+
+## Approach Section
+
+Highlights core development principles with interactive cards:
+
+```tsx
+<section>
+    <h2 className="text-sm font-medium tracking-widest text-slate-500 mb-8">
+        MY APPROACH
+    </h2>
+    <div className="grid sm:grid-cols-2 gap-6">
+        <div className="p-6 bg-slate-900/50 border border-white/10 rounded-2xl hover:border-cyan-400/30 transition-colors">
+            <h3 className="font-semibold mb-2 text-slate-100">Maintainable Code</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+                I prioritize writing readable and well-structured code. A successful
+                project is one that other developers can understand and extend easily.
+            </p>
+        </div>
+        <div className="p-6 bg-slate-900/50 border border-white/10 rounded-2xl hover:border-cyan-400/30 transition-colors">
+            <h3 className="font-semibold mb-2 text-slate-100">Performance First</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+                Every technical decision considers the impact on user experience.
+                I optimize for fast load times and smooth navigation.
+            </p>
+        </div>
+    </div>
+</section>
+```
+
+### Interactive Features:
+- **Hover effects** on borders (white/10 → cyan-400/30)
+- **2-column grid** on desktop
+- **Card structure** with heading and description
+- **Transition animations** on hover
+
+## Reveal Animations
+
+All sections use the `Reveal` component for scroll animations:
+
+```tsx
+<Reveal>
+    <header className="mb-12">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-slate-100">
+            ABOUT
+        </h1>
+    </header>
+</Reveal>
+
+<Reveal delay={0.1}>
+    {/* Bio section */}
+</Reveal>
+
+<Reveal delay={0.2}>
+    {/* Tech Stack section */}
+</Reveal>
+
+<Reveal delay={0.3}>
+    {/* Approach section */}
+</Reveal>
+```
+
+### Delay Pattern:
+- **Header**: No delay (0s)
+- **Bio**: 0.1s delay
+- **Tech Stack**: 0.2s delay
+- **Approach**: 0.3s delay
+
+This creates a cascading reveal effect as the user scrolls.
+
+## Layout Container
+
+The page uses a consistent container pattern:
+
+```tsx
+<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+    {/* Page content */}
+</div>
+```
+
+### Responsive Padding:
+- **Mobile**: px-4, py-16
+- **Small screens**: px-6, py-24
+- **Large screens**: px-8, py-24
+
+## Typography Hierarchy
+
+### Page Title
+```tsx
+<h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-slate-100">
+    ABOUT
+</h1>
+```
+
+### Section Headings
+```tsx
+<h2 className="text-sm font-medium tracking-widest text-slate-500 mb-8">
+    TECH STACK
+</h2>
+```
+
+### Category Headings
+```tsx
+<h3 className="font-semibold mb-4 text-cyan-400">
+    {tech.category}
+</h3>
+```
+
+### Body Text
+```tsx
+<p className="text-lg text-slate-400 leading-relaxed mb-6">
+    {/* Content */}
+</p>
+```
+
+## Color Scheme
+
+- **Primary text**: `text-slate-100` (headings)
+- **Secondary text**: `text-slate-400` (body)
+- **Accent color**: `text-cyan-400` (highlights)
+- **Muted text**: `text-slate-500` (section labels)
+- **Background**: `bg-slate-900/50` (cards)
+- **Borders**: `border-white/10` (default), `border-cyan-400/30` (hover)
+
+## Dependencies
+
+```tsx
+import type { Metadata } from "next";
+import Reveal from "@/components/Reveal";
+```
+
+## Page Component Structure
+
+```tsx
+export default function AboutPage() {
+    return (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+            {/* Header with Reveal animation */}
+            <Reveal>
+                <header className="mb-12">
+                    {/* Page title */}
+                </header>
+            </Reveal>
+
+            {/* Bio Section */}
+            <Reveal delay={0.1}>
+                <section className="mb-16">
+                    {/* Bio paragraphs */}
+                </section>
+            </Reveal>
+
+            {/* Tech Stack Section */}
+            <Reveal delay={0.2}>
+                <section className="mb-16">
+                    {/* Tech cards grid */}
+                </section>
+            </Reveal>
+
+            {/* Approach Section */}
+            <Reveal delay={0.3}>
+                <section>
+                    {/* Approach cards grid */}
+                </section>
+            </Reveal>
+        </div>
+    );
+}
+```
+
+## File Location
+
+`src/app/about/page.tsx:1-96`

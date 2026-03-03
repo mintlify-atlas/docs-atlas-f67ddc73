@@ -1,0 +1,216 @@
+---
+title: CodeBlock
+description: Split-panel component for displaying API request/response examples
+---
+
+# CodeBlock
+
+A two-column component that displays API request and response data in a terminal-style interface with syntax highlighting.
+
+## Location
+
+**Source:** `src/components/CodeBlock.tsx`
+
+## Features
+
+- Side-by-side request/response layout
+- Terminal-style headers with status indicators
+- HTTP method badge with color coding
+- Syntax-highlighted JSON code blocks
+- Responsive grid layout
+- Optional headers and body sections
+- Monospace font for code readability
+
+## Props
+
+<ParamField path="sample" type="SampleRequest" required>
+  Sample request object containing method, endpoint, and optional headers, body, and response
+</ParamField>
+
+## Type Definitions
+
+From `@/data/projects.ts`:
+
+```typescript
+type SampleRequest = {
+  method: string;
+  endpoint: string;
+  headers?: string;
+  body?: string;
+  response?: string;
+};
+```
+
+## Usage
+
+### Basic Example
+
+```tsx
+import CodeBlock from "@/components/CodeBlock";
+
+const sample = {
+  method: "POST",
+  endpoint: "/v1/items",
+  headers: "Authorization: Bearer <token>\nContent-Type: application/json",
+  body: `{
+  "sku": "WIDGET-001",
+  "name": "Industrial Widget",
+  "costPrice": 15.50
+}`,
+  response: `{
+  "id": "770e8400-e29b-41d4-a716-446655440002",
+  "sku": "WIDGET-001",
+  "name": "Industrial Widget",
+  "isActive": true
+}`
+};
+
+<CodeBlock sample={sample} />;
+```
+
+### Project Detail Page Usage
+
+From `src/app/projects/[slug]/page.tsx`:
+
+```tsx
+{isApiProject && hasSampleRequest && (
+  <Reveal delay={0.35}>
+    <section className="mb-12">
+      <h2 className="text-sm font-medium tracking-widest text-slate-500 mb-4">
+        SAMPLE REQUEST
+      </h2>
+      <CodeBlock sample={project.sampleRequest!} />
+    </section>
+  </Reveal>
+)}
+```
+
+### Minimal Example (No Response)
+
+```tsx
+const sample = {
+  method: "GET",
+  endpoint: "/v1/items",
+  headers: "Authorization: Bearer <token>"
+};
+
+<CodeBlock sample={sample} />;
+```
+
+## Request Panel
+
+The left panel displays:
+
+1. **Header** with blue status indicator and "REQUEST" label
+2. **HTTP Method Badge** in blue with semantic styling
+3. **Endpoint** path in monospace
+4. **Headers** (if provided) in small slate text
+5. **Request Body** (if provided) in cyan-colored JSON
+
+### Request Header Structure
+
+```tsx
+<div className="px-4 py-2 bg-slate-900/50 border-b border-white/5 flex items-center gap-2">
+  <span className="w-2 h-2 rounded-full bg-blue-500" />
+  <span className="text-xs font-semibold text-slate-400">REQUEST</span>
+</div>
+```
+
+## Response Panel
+
+The right panel displays:
+
+1. **Header** with emerald status indicator and "RESPONSE" label
+2. **Response Body** in emerald-colored JSON
+
+The response panel only renders if `sample.response` is provided.
+
+### Conditional Rendering
+
+```tsx
+{sample.response && (
+  <div className="bg-slate-950 border border-white/10 rounded-xl overflow-hidden">
+    {/* Response content */}
+  </div>
+)}
+```
+
+## Layout
+
+- **Desktop**: Two-column grid (`md:grid-cols-2`)
+- **Mobile**: Stacked layout (single column)
+- **Gap**: `gap-4` between columns
+
+## Headers Display
+
+Headers are displayed as newline-separated text:
+
+```tsx
+{sample.headers && (
+  <div className="text-slate-500 text-xs">
+    {sample.headers.split('\n').map((header, i) => (
+      <div key={i}>{header}</div>
+    ))}
+  </div>
+)}
+```
+
+## Code Styling
+
+### Request Body
+```css
+text-cyan-400 text-xs overflow-x-auto bg-slate-900/50 rounded-lg p-3
+```
+
+### Response Body
+```css
+text-emerald-400 text-xs overflow-x-auto bg-slate-900/50 rounded-lg p-3
+```
+
+## Color Scheme
+
+- **Background**: `bg-slate-950`
+- **Borders**: `border-white/10`
+- **Request accent**: Blue (`bg-blue-500/20 text-blue-400`)
+- **Response accent**: Emerald (`text-emerald-400`)
+- **Headers text**: `text-slate-500`
+- **Code text**: Cyan (request) and Emerald (response)
+
+## Accessibility
+
+- Semantic structure with proper headings
+- Monospace font for code readability
+- Sufficient color contrast for syntax highlighting
+- Scrollable overflow for long code blocks
+
+## Best Practices
+
+1. Format JSON with proper indentation
+2. Keep headers concise and relevant
+3. Use realistic example data
+4. Include common authentication headers
+5. Show complete, valid JSON structures
+
+## Example Data Structure
+
+```typescript
+const inventoryApiSample: SampleRequest = {
+  method: "POST",
+  endpoint: "/v1/items",
+  headers: "Authorization: Bearer <token>\nContent-Type: application/json",
+  body: JSON.stringify({
+    sku: "WIDGET-001",
+    name: "Industrial Widget",
+    categoryId: "550e8400-e29b-41d4-a716-446655440000",
+    costPrice: 15.50,
+    salePrice: 24.99
+  }, null, 2),
+  response: JSON.stringify({
+    id: "770e8400-e29b-41d4-a716-446655440002",
+    sku: "WIDGET-001",
+    name: "Industrial Widget",
+    isActive: true,
+    createdAt: "2024-01-15T10:30:00Z"
+  }, null, 2)
+};
+```

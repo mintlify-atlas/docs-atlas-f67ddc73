@@ -1,0 +1,365 @@
+---
+title: Routing Structure
+description: Next.js App Router implementation and page organization
+---
+
+## App Router Architecture
+
+The portfolio uses **Next.js App Router** (introduced in Next.js 13+) with file-system based routing. All routes are defined in the `src/app/` directory.
+
+## Route Structure
+
+### Public Routes
+
+```
+/                           → src/app/page.tsx
+/about                      → src/app/about/page.tsx
+/projects                   → src/app/projects/page.tsx
+/projects/[slug]            → src/app/projects/[slug]/page.tsx
+/contact                    → src/app/contact/page.tsx
+```
+
+### API Routes
+
+```
+POST /api/contact           → src/app/api/contact/route.ts
+```
+
+## Page Implementations
+
+### 1. Homepage (`src/app/page.tsx`)
+
+**Route**: `/`
+
+**Purpose**: Main landing page with hero, projects preview, tech stack, and CTA sections.
+
+**Rendering**: Server Component with static generation
+
+**Key Features**:
+- Hero section with availability badge and profile image
+- Specialties grid (Frontend, Backend, DevOps)
+- Featured projects preview (first 3 projects from data)
+- Work process timeline (4 steps)
+- Tech stack badges with icons
+- Dual CTA (WhatsApp + Contact form)
+
+**Data Source**:
+```typescript
+import { projects } from "@/data/projects";
+```
+
+**Notable Patterns**:
+- Uses `next/image` with priority loading for profile photo
+- Conditional rendering for API vs webapp project cards
+- WhatsApp deep link with pre-filled message
+
+---
+
+### 2. Projects Listing (`src/app/projects/page.tsx`)
+
+**Route**: `/projects`
+
+**Purpose**: Grid view of all portfolio projects.
+
+**Rendering**: Client Component (`"use client"`)
+
+**Key Features**:
+- 2-column responsive grid (1 col mobile, 2 col tablet+)
+- Staggered reveal animations using `Reveal` component
+- Motion animations on hover (`motion/react`)
+- Conditional preview (API card vs image)
+
+**Component Structure**:
+```typescript
+export default function ProjectsPage() {
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+      <Reveal>
+        <header>...</header>
+      </Reveal>
+      
+      <div className="grid sm:grid-cols-2 gap-6">
+        {projects.map((project, index) => (
+          <Reveal key={project.slug} delay={0.1 * index}>
+            <Link href={`/projects/${project.slug}`}>
+              {/* Project card */}
+            </Link>
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### 3. Project Detail (`src/app/projects/[slug]/page.tsx`)
+
+**Route**: `/projects/[slug]` (dynamic)
+
+**Purpose**: Detailed project case study with media, tech stack, and challenges.
+
+**Rendering**: Server Component with Static Site Generation
+
+**Static Generation**:
+```typescript
+export async function generateStaticParams() {
+  const slugs = getAllSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
+```
+
+Generates static pages at build time for:
+- `/projects/booking-platform`
+- `/projects/payroll-platform`
+- `/projects/inventory-api`
+
+**Dynamic Metadata**:
+```typescript
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const project = getProjectBySlug(slug);
+
+  if (!project) {
+    return { title: "Project not found" };
+  }
+
+  return {
+    title: project.title,
+    description: project.description,
+  };
+}
+```
+
+**Conditional Sections**:
+- Problem/Solution/Result cards (if extended info exists)
+- Image carousel + mobile frame (webapp projects)
+- API capabilities badges (API projects)
+- Endpoints table (API projects)
+- Sample request/response (API projects)
+- Architecture patterns
+- Technical challenges
+- Lessons learned
+
+**Layout Pattern**:
+```typescript
+const hasImages = project.images && project.images.desktop.length > 0;
+const isApiProject = project.displayType === "api";
+
+{hasImages && !isApiProject && (
+  <div className="grid gap-6 mb-12 items-start lg:grid-cols-[1fr_280px]">
+    <ImageCarousel images={project.images!.desktop} />
+    {project.images!.mobile && (
+      <PhoneFrame image={project.images!.mobile} />
+    )}
+  </div>
+)}
+```
+
+---
+
+### 4. Contact Page (`src/app/contact/page.tsx`)
+
+**Route**: `/contact`
+
+**Purpose**: Contact form with email integration.
+
+**Custom Layout**: Uses `src/app/contact/layout.tsx` to customize the page wrapper.
+
+**Features**:
+- Form validation (client-side)
+- API integration with `/api/contact`
+- Loading states
+- Success/error feedback
+
+---
+
+### 5. About Page (`src/app/about/page.tsx`)
+
+**Route**: `/about`
+
+**Purpose**: Personal biography and professional background.
+
+**Rendering**: Server Component
+
+---
+
+## API Route Handler
+
+### Contact Form Endpoint (`src/app/api/contact/route.ts`)
+
+**Method**: `POST`
+
+**Purpose**: Send contact form submissions via email using Resend API.
+
+**Force Dynamic Rendering**:
+```typescript
+export const dynamic = "force-dynamic";
+```
+
+Prevents build-time execution and ensures the route is always server-rendered.
+
+**Request Validation**:
+```typescript
+const { name, email, subject, message } = body;
+
+if (!name || !email || !message) {
+  return NextResponse.json(
+    { error: "Name, email, and message are required" },
+    { status: 400 }
+  );
+}
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if (!emailRegex.test(email)) {
+  return NextResponse.json(
+    { error: "Invalid email address" },
+    { status: 400 }
+  );
+}
+```
+
+**Email Sending**:
+```typescript
+const { data, error } = await resend.emails.send({
+  from: "Portfolio Contact <onboarding@resend.dev>",
+  to: process.env.CONTACT_EMAIL || "maerodriguezdev@gmail.com",
+  replyTo: email,
+  subject: subject || `New message from ${name}`,
+  html: `...` // Custom HTML template
+});
+```
+
+**Error Handling**:
+- Missing API key: 503 Service Unavailable
+- Invalid input: 400 Bad Request
+- Email send failure: 500 Internal Server Error
+- Success: 200 with message ID
+
+---
+
+## Layout Hierarchy
+
+### Root Layout (`src/app/layout.tsx`)
+
+Applies to all pages:
+
+```typescript
+export default function RootLayout({ children }) {
+  return (
+    <html lang="es" className="dark">
+      <body className={`${spaceGrotesk.variable} ...`}>
+        <Navbar />
+        <main className="flex-1 relative">{children}</main>
+        <Footer />
+        <SpeedInsights />
+      </body>
+    </html>
+  );
+}
+```
+
+**Global Features**:
+- Space Grotesk font loading
+- Dark theme (`className="dark"`)
+- Navbar (sticky header)
+- Footer
+- Speed Insights analytics
+- SEO metadata (title, description, Open Graph, Twitter cards)
+
+**Metadata Configuration**:
+```typescript
+export const metadata: Metadata = {
+  title: {
+    default: "Mario Rodríguez | Full-Stack Developer",
+    template: "%s | Mario Rodríguez",
+  },
+  description: "Construyo aplicaciones web rápidas y escalables...",
+  keywords: ["desarrollador web", "full-stack developer", ".NET", "Next.js"],
+  openGraph: { /* ... */ },
+  twitter: { /* ... */ },
+};
+```
+
+### Contact Layout (`src/app/contact/layout.tsx`)
+
+Custom layout for contact page (overrides default spacing/styling).
+
+---
+
+## Navigation Patterns
+
+### Internal Links
+
+Using Next.js `Link` component for client-side navigation:
+
+```typescript
+import Link from "next/link";
+
+<Link href="/projects">View all projects</Link>
+<Link href={`/projects/${project.slug}`}>View Details</Link>
+```
+
+### Hash Anchors (Same-Page Navigation)
+
+Using standard `<a>` tags for smooth scrolling:
+
+```typescript
+<a href="#projects">Projects</a>
+<a href="#stack">Stack</a>
+<a href="#contact">Contact</a>
+```
+
+### External Links
+
+With security attributes:
+
+```typescript
+<a
+  href={project.repo}
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  View Repository
+</a>
+```
+
+---
+
+## Dynamic Params Handling
+
+Next.js 14+ requires async params:
+
+```typescript
+type Props = {
+  params: Promise<{ slug: string }>;
+};
+
+export default async function ProjectDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const project = getProjectBySlug(slug);
+
+  if (!project) {
+    notFound(); // Renders 404 page
+  }
+
+  return <div>...</div>;
+}
+```
+
+---
+
+## 404 Handling
+
+Using Next.js `notFound()` function:
+
+```typescript
+import { notFound } from "next/navigation";
+
+if (!project) {
+  notFound();
+}
+```
+
+Next.js automatically renders the closest `not-found.tsx` file or default 404 page.

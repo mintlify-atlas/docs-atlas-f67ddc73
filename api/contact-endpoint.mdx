@@ -1,0 +1,235 @@
+---
+title: 'Contact Form API'
+description: 'Send contact form submissions via email using Resend'
+---
+
+## Overview
+
+The Contact API endpoint handles contact form submissions and sends them via email using the Resend email service. This endpoint validates the input, formats the message, and delivers it to the configured recipient.
+
+**Endpoint**: `/api/contact`
+
+**Method**: `POST`
+
+## Request
+
+### Headers
+
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+### Request Body
+
+<ParamField path="name" type="string" required>
+  The sender's full name
+</ParamField>
+
+<ParamField path="email" type="string" required>
+  The sender's email address. Must be a valid email format matching the pattern: `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`
+</ParamField>
+
+<ParamField path="message" type="string" required>
+  The message content from the sender
+</ParamField>
+
+<ParamField path="subject" type="string">
+  Optional subject line for the email. If not provided, defaults to "New message from {name}"
+</ParamField>
+
+### Example Request
+
+```javascript
+const response = await fetch('/api/contact', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    subject: 'Project Inquiry',
+    message: 'I would like to discuss a potential project...'
+  })
+});
+
+const data = await response.json();
+```
+
+## Response
+
+### Success Response (200)
+
+<ResponseField name="success" type="boolean">
+  Indicates whether the email was sent successfully
+</ResponseField>
+
+<ResponseField name="messageId" type="string">
+  Unique identifier for the sent email from Resend
+</ResponseField>
+
+```json
+{
+  "success": true,
+  "messageId": "abc123-def456-ghi789"
+}
+```
+
+### Error Responses
+
+#### 400 Bad Request - Missing Required Fields
+
+Returned when `name`, `email`, or `message` fields are missing.
+
+```json
+{
+  "error": "Name, email, and message are required"
+}
+```
+
+#### 400 Bad Request - Invalid Email
+
+Returned when the email address doesn't match the validation pattern.
+
+```json
+{
+  "error": "Invalid email address"
+}
+```
+
+#### 500 Internal Server Error - Email Send Failure
+
+Returned when Resend fails to send the email.
+
+```json
+{
+  "error": "Failed to send email. Please try again."
+}
+```
+
+#### 503 Service Unavailable - Missing Configuration
+
+Returned when the `RESEND_API_KEY` environment variable is not configured.
+
+```json
+{
+  "error": "Email service is not configured. Please try again later."
+}
+```
+
+#### 500 Internal Server Error - Unexpected Error
+
+Returned when an unexpected error occurs during processing.
+
+```json
+{
+  "error": "An unexpected error occurred"
+}
+```
+
+## Validation Rules
+
+The endpoint enforces the following validation rules:
+
+1. **Required Fields**: `name`, `email`, and `message` must be provided
+2. **Email Format**: The email must match the regex pattern `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`
+3. **API Configuration**: `RESEND_API_KEY` must be set in environment variables
+
+## Email Integration
+
+The endpoint uses [Resend](https://resend.com) to send emails with the following configuration:
+
+- **From**: `Portfolio Contact <onboarding@resend.dev>`
+- **To**: Value from `CONTACT_EMAIL` environment variable (defaults to `maerodriguezdev@gmail.com`)
+- **Reply-To**: The sender's email address from the request
+- **Subject**: Custom subject or "New message from {name}"
+- **Format**: HTML email with styled template
+
+### Email Template
+
+The email is formatted with a dark-themed HTML template that includes:
+
+- Portfolio branding with green accent color (`#10b981`)
+- Contact details (name, email, optional subject)
+- Message content with preserved formatting
+- Footer indicating the source as the portfolio contact form
+
+## Environment Variables
+
+<ParamField path="RESEND_API_KEY" type="string" required>
+  API key for authenticating with Resend. Get this from your [Resend dashboard](https://resend.com/api-keys).
+</ParamField>
+
+<ParamField path="CONTACT_EMAIL" type="string">
+  Email address to receive contact form submissions. Defaults to `maerodriguezdev@gmail.com` if not set.
+</ParamField>
+
+## Implementation Details
+
+### Route Configuration
+
+The route is configured with `dynamic = "force-dynamic"` to prevent build-time execution and ensure the API key is read at runtime.
+
+```typescript
+// Force dynamic to prevent build-time execution
+export const dynamic = "force-dynamic";
+```
+
+### Error Handling
+
+The endpoint implements comprehensive error handling:
+
+1. **Configuration Check**: Validates API key presence before processing
+2. **Input Validation**: Checks required fields and email format
+3. **Resend Error Handling**: Catches and logs Resend API errors
+4. **Catch-All**: Handles unexpected errors with appropriate responses
+
+### Source Code Reference
+
+For the complete implementation, see:
+- Route handler: `src/app/api/contact/route.ts:7`
+
+## Complete Example
+
+Here's a complete example using the Contact API with proper error handling:
+
+```typescript
+async function sendContactMessage(formData: {
+  name: string;
+  email: string;
+  subject?: string;
+  message: string;
+}) {
+  try {
+    const response = await fetch('/api/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to send message');
+    }
+
+    console.log('Message sent successfully:', data.messageId);
+    return data;
+  } catch (error) {
+    console.error('Error sending message:', error);
+    throw error;
+  }
+}
+
+// Usage
+await sendContactMessage({
+  name: 'Jane Smith',
+  email: 'jane@example.com',
+  subject: 'Partnership Opportunity',
+  message: 'Hi Mario, I came across your portfolio...'
+});
+```

@@ -1,80 +1,368 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick Start
+description: Set up and run the Mario Rodriguez Portfolio locally in minutes
 ---
 
-## Get started in three steps
+# Quick Start Guide
 
-Get your documentation site running locally and make your first customization.
+Get the portfolio website running on your local machine in just a few steps. This guide covers installation, development, and building for production.
 
-### Step 1: Set up your local environment
+## Prerequisites
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+Before you begin, ensure you have the following installed:
 
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
+- **Node.js**: Version 20 or higher
+- **Package Manager**: npm, yarn, or pnpm
+- **Git**: For cloning the repository
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  This project uses **pnpm** as the default package manager. The lockfile is `pnpm-lock.yaml`.
 </Note>
+
+## Installation
+
+<Steps>
+  <Step title="Clone the Repository">
+    Clone the portfolio source code to your local machine:
+
+    ```bash
+    git clone https://github.com/mariorodriguez/portfolio.git
+    cd portfolio
+    ```
+  </Step>
+
+  <Step title="Install Dependencies">
+    Install the required packages using your preferred package manager:
+
+    <CodeGroup>
+      ```bash npm
+      npm install
+      ```
+
+      ```bash yarn
+      yarn install
+      ```
+
+      ```bash pnpm
+      pnpm install
+      ```
+    </CodeGroup>
+
+    This will install all dependencies from `package.json`:
+
+    ```json title="package.json" {11-20}
+    {
+      "dependencies": {
+        "@vercel/blob": "^2.0.1",
+        "@vercel/speed-insights": "^1.3.1",
+        "motion": "^12.29.2",
+        "next": "16.1.6",
+        "react": "19.2.4",
+        "react-dom": "19.2.4",
+        "react-icons": "^5.5.0",
+        "resend": "^6.9.1"
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="Configure Environment (Optional)">
+    For full functionality including contact form, create a `.env.local` file:
+
+    ```bash
+    touch .env.local
+    ```
+
+    Add your Resend API key for email functionality:
+
+    ```bash title=".env.local"
+    RESEND_API_KEY=your_resend_api_key_here
+    ```
+
+    <Warning>
+      The site will run without environment variables, but the contact form won't send emails.
+    </Warning>
+  </Step>
+
+  <Step title="Start Development Server">
+    Run the development server:
+
+    <CodeGroup>
+      ```bash npm
+      npm run dev
+      ```
+
+      ```bash yarn
+      yarn dev
+      ```
+
+      ```bash pnpm
+      pnpm dev
+      ```
+    </CodeGroup>
+
+    The development server will start at `http://localhost:3000`.
+
+    <Check>
+      Open [http://localhost:3000](http://localhost:3000) in your browser to see the portfolio.
+    </Check>
+  </Step>
+</Steps>
+
+## Available Scripts
+
+The portfolio includes several npm scripts for development and production:
+
+```json title="package.json" {5-10}
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  }
+}
+```
+
+### Development
+
+```bash
+npm run dev
+```
+
+Starts the Next.js development server with:
+- Hot module replacement
+- Fast refresh for instant updates
+- TypeScript type checking
+- ESLint error reporting
+
+### Production Build
+
+```bash
+npm run build
+```
+
+Creates an optimized production build:
+- Minifies JavaScript and CSS
+- Optimizes images (AVIF/WebP)
+- Generates static pages
+- Tree-shakes unused code
+
+### Production Server
+
+```bash
+npm run start
+```
+
+Starts the production server after building. Requires `npm run build` first.
+
+### Linting
+
+```bash
+npm run lint
+```
+
+Runs ESLint with Next.js configuration to check for code quality issues.
+
+## Project Structure
+
+Here's the essential folder structure:
+
+```bash
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx          # Root layout with metadata
+│   │   ├── page.tsx            # Homepage with hero & projects
+│   │   ├── globals.css         # Global styles & Tailwind
+│   │   ├── projects/           # Project pages
+│   │   └── contact/            # Contact form
+│   ├── components/
+│   │   ├── Navbar.tsx          # Navigation component
+│   │   ├── Footer.tsx          # Footer component
+│   │   ├── ApiPreviewCard.tsx  # API endpoint display
+│   │   ├── ImageCarousel.tsx   # Image gallery
+│   │   ├── PhoneFrame.tsx      # Mobile mockup
+│   │   ├── CodeBlock.tsx       # Syntax highlighting
+│   │   └── Reveal.tsx          # Scroll animations
+│   └── data/
+│       └── projects.ts         # Portfolio project data
+├── public/
+│   └── images/                 # Static images
+├── package.json                # Dependencies & scripts
+├── next.config.ts              # Next.js configuration
+├── tailwind.config.ts          # Tailwind CSS config
+└── tsconfig.json               # TypeScript config
+```
+
+## Development Workflow
+
+### Editing Content
+
+The homepage is defined in `src/app/page.tsx`. You can edit:
+
+```tsx title="src/app/page.tsx" {167-169}
+<h1 className="text-5xl md:text-6xl font-black">
+  WEB DEVELOPER <span className="text-emerald-500">.NET + NEXT.JS</span>
+</h1>
+
+<p className="text-slate-400 text-lg md:text-xl">
+  I build fast and scalable web applications with clean UI and robust APIs.
+</p>
+```
+
+### Adding Projects
+
+Projects are defined in `src/data/projects.ts`:
+
+```typescript title="src/data/projects.ts"
+export const projects: Project[] = [
+  {
+    slug: "booking-platform",
+    title: "Refugio del Sol — Booking Platform",
+    description: "Rental booking platform with guided 3-step flow...",
+    stack: [".NET 10", "Blazor Server", "MudBlazor", "Entity Framework"],
+    highlights: [
+      "3-step booking flow with validation",
+      "Date-based availability management",
+      "Admin panel for operations"
+    ],
+    images: {
+      desktop: [
+        { src: "https://...", alt: "Landing page" }
+      ]
+    },
+    repo: "https://github.com/...",
+    status: "in-progress"
+  }
+  // Add more projects...
+];
+```
+
+### Customizing Styles
+
+The project uses Tailwind CSS 4. Global styles are in `src/app/globals.css`:
+
+```css title="src/app/globals.css"
+@import "tailwindcss";
+
+:root {
+  --font-space-grotesk: "Space Grotesk", sans-serif;
+}
+
+body {
+  background: #101622;
+  color: white;
+}
+```
+
+## Next.js Configuration
+
+The site is configured for optimal image handling:
+
+```typescript title="next.config.ts"
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  images: {
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "9jaubfal4qpj0a4o.public.blob.vercel-storage.com",
+        pathname: "/**",
+      },
+    ],
+  },
+};
+
+export default nextConfig;
+```
+
+<Info>
+  Images are served from Vercel Blob Storage and automatically optimized to AVIF/WebP formats.
+</Info>
+
+## TypeScript Configuration
+
+The project uses strict TypeScript settings:
+
+```json title="tsconfig.json" {7}
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "strict": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+```
+
+Use the `@/` alias for absolute imports:
+
+```typescript
+import Navbar from "@/components/Navbar";
+import { projects } from "@/data/projects";
+```
+
+## Troubleshooting
+
+### Port Already in Use
+
+If port 3000 is occupied, Next.js will automatically use the next available port (3001, 3002, etc.).
+
+### Module Not Found
+
+Clear the cache and reinstall dependencies:
+
+```bash
+rm -rf node_modules .next
+pnpm install
+pnpm dev
+```
+
+### TypeScript Errors
+
+Run the TypeScript compiler to see detailed errors:
+
+```bash
+npx tsc --noEmit
+```
+
+### Image Loading Issues
+
+Ensure remote patterns are configured in `next.config.ts` for external images.
+
+## What's Next?
+
+<CardGroup cols={2}>
+  <Card title="Customize Components" icon="paint-brush" href="/components">
+    Learn about the reusable UI components
+  </Card>
+  <Card title="Deploy to Production" icon="rocket" href="/deployment">
+    Deploy your customized portfolio
+  </Card>
+  <Card title="Project Architecture" icon="building" href="/architecture">
+    Understand the codebase structure
+  </Card>
+  <Card title="API Integration" icon="plug" href="/api">
+    Set up the contact form API
+  </Card>
+</CardGroup>
+
+## Getting Help
+
+<CardGroup cols={2}>
+  <Card title="Next.js Docs" icon="book" href="https://nextjs.org/docs">
+    Learn about Next.js features and API
+  </Card>
+  <Card title="Tailwind CSS" icon="palette" href="https://tailwindcss.com/docs">
+    Explore Tailwind CSS utilities
+  </Card>
+  <Card title="TypeScript" icon="code" href="https://www.typescriptlang.org/docs">
+    TypeScript documentation
+  </Card>
+  <Card title="Vercel" icon="cloud" href="https://vercel.com/docs">
+    Deployment platform guides
+  </Card>
+</CardGroup>
