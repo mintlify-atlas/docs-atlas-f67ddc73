@@ -1,0 +1,91 @@
+{
+  "projectType": "frontend",
+  "projectName": "Mario Rodriguez Portfolio",
+  "projectDescription": "Modern portfolio website showcasing full-stack development projects built with Next.js and TypeScript",
+  "theme": "palm",
+  "primaryColor": "#10b981",
+  "lightColor": "#34d399",
+  "darkColor": "#059669",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "introduction",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Project Structure",
+        "pages": [
+          "architecture/overview",
+          "architecture/routing",
+          "architecture/components",
+          "architecture/data-management"
+        ]
+      },
+      {
+        "group": "Components",
+        "pages": [
+          "components/navbar",
+          "components/footer",
+          "components/api-preview-card",
+          "components/code-block",
+          "components/endpoints-table",
+          "components/image-carousel",
+          "components/phone-frame",
+          "components/reveal"
+        ]
+      },
+      {
+        "group": "Pages",
+        "pages": [
+          "pages/home",
+          "pages/about",
+          "pages/projects",
+          "pages/project-detail",
+          "pages/contact"
+        ]
+      },
+      {
+        "group": "API Routes",
+        "pages": [
+          "api/contact-endpoint"
+        ]
+      },
+      {
+        "group": "Styling & Design",
+        "pages": [
+          "styling/tailwind-setup",
+          "styling/design-system",
+          "styling/animations"
+        ]
+      },
+      {
+        "group": "Deployment",
+        "pages": [
+          "deployment/vercel",
+          "deployment/environment-variables"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Responsive portfolio showcase with project galleries",
+    "API preview cards for backend projects",
+    "Contact form with Resend email integration",
+    "Image carousels with Vercel Blob storage",
+    "Tech stack visualization with React Icons",
+    "Mobile-first responsive design with Tailwind CSS",
+    "Dynamic project routing with Next.js App Router",
+    "Professional animations with Framer Motion"
+  ],
+  "publicApiSurface": [
+    "POST /api/contact - Contact form submission endpoint",
+    "Home Page (/) - Portfolio landing and project showcase",
+    "About Page (/about) - Developer information",
+    "Projects Page (/projects) - Full project listing",
+    "Project Detail Page (/projects/[slug]) - Individual project details",
+    "Contact Page (/contact) - Contact form"
+  ]
+}
