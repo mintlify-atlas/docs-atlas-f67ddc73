@@ -245,7 +245,7 @@ type RevealProps = {
 };
 ```
 
-**Implementation**: Uses Framer Motion's `motion` and viewport detection:
+**Implementation**: Uses motion/react's `motion` and viewport detection:
 
 ```typescript
 import { motion } from "motion/react";
@@ -356,7 +356,7 @@ type CodeBlockProps = {
 **Client Components** (require `"use client"`):
 - `Navbar` (useState for mobile menu)
 - `ImageCarousel` (useState for current index)
-- `Reveal` (uses Framer Motion hooks)
+- `Reveal` (uses motion/react hooks)
 - `ProjectsPage` (uses motion animations)
 
 **Server Components** (default):
@@ -466,7 +466,7 @@ rounded-full         /* Pills, badges, avatars */
 
 ## Animation Conventions
 
-Using Framer Motion for subtle animations:
+Using motion/react for subtle animations:
 
 ```typescript
 // Hover scale

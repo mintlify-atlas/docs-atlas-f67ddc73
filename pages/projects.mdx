@@ -16,7 +16,7 @@ This is a **client component** as indicated by the `"use client"` directive:
 ```
 
 This is required because the page uses:
-- Framer Motion animations
+- Motion library animations
 - Interactive hover effects
 - Client-side state management
 
@@ -59,7 +59,7 @@ export default function ProjectsPage() {
 
 ## Project Card Component
 
-Each project is wrapped in a `Link` component with Framer Motion animations:
+Each project is wrapped in a `Link` component with motion/react animations:
 
 ```tsx
 <Link href={`/projects/${project.slug}`} className="block group">
@@ -234,7 +234,7 @@ import ApiPreviewCard from "@/components/ApiPreviewCard";
 ```
 
 ### Key Imports:
-- **motion/react**: Framer Motion for animations
+- **motion/react**: Motion library for animations
 - **@/data/projects**: Projects data source
 - **Reveal**: Custom scroll reveal component
 - **ApiPreviewCard**: Component for API project previews
